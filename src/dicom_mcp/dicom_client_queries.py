@@ -10,7 +10,7 @@ from pydicom.dataset import Dataset
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
-from pynetdicom.sop_class import PatientRootQueryRetrieveInformationModelFind
+from pynetdicom.sop_class import PatientRootQueryInformationModelFind
 
 from .attributes import get_attributes_for_level
 from .errors import DicomAssociationError
@@ -172,7 +172,7 @@ class DicomClientQueryMixin:
             self._set_query_attribute(ds, attr)
 
         # Execute query
-        return self.find(ds, PatientRootQueryRetrieveInformationModelFind)
+        return self.find(ds, PatientRootQueryInformationModelFind)
 
     def query_study(
         self,

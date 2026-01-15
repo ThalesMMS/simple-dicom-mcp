@@ -26,14 +26,6 @@ class CallingAETConfig(BaseModel):
     aliases: list[str] = Field(default_factory=list)
 
 
-class StorageConfig(BaseModel):
-    """Configuration for local storage and retention."""
-    path: str = "./downloads"
-    retention_days: int = 30
-    dir_permissions: str = "0o700"  # Owner read/write/execute only
-    file_permissions: str = "0o600"  # Owner read/write only
-
-
 class RetryConfig(BaseModel):
     """Configuration for retry attempts and backoff."""
     max_attempts: int = 2
@@ -63,16 +55,7 @@ class NetworkConfig(BaseModel):
     network_timeout: int = 30
     assoc_timeout: int = 10
     max_pdu: int = 16384
-    storage_contexts: str = "all"
     retry: RetryConfig = RetryConfig()
-
-    @field_validator("storage_contexts")
-    @classmethod
-    def validate_storage_contexts(cls, value: str) -> str:
-        normalized = str(value).strip().lower()
-        if normalized not in {"all", "core"}:
-            raise ValueError("network.storage_contexts must be 'all' or 'core'")
-        return normalized
 
 
 class DicomConfiguration(BaseModel):
@@ -81,23 +64,13 @@ class DicomConfiguration(BaseModel):
     current_node: str
     calling_aet: str
     calling_aets: Dict[str, CallingAETConfig] = Field(default_factory=dict)
-    query_retrieve_root: str = Field(
+    query_root: str = Field(
         default="study",
-        description="Query/Retrieve root to use (study or patient).",
+        description="Query root to use (study or patient).",
     )
-    # Optional legacy field for backward compatibility
-    download_directory: str | None = None
-    # New storage configuration
-    storage: StorageConfig = StorageConfig()
     network: NetworkConfig = NetworkConfig()
 
     @property
-    def download_path(self) -> str:
-        """Get the effective download path, preferring legacy download_directory if set."""
-        if self.download_directory:
-            return self.download_directory
-        return self.storage.path
-
     def _find_calling_aet(self, name: str) -> Optional[Tuple[str, CallingAETConfig]]:
         if not name:
             return None
@@ -130,16 +103,16 @@ class DicomConfiguration(BaseModel):
             raise ValueError(f"Calling AE '{name}' not found in configuration")
         return match
 
-    @field_validator("query_retrieve_root")
+    @field_validator("query_root")
     @classmethod
-    def validate_query_retrieve_root(cls, value: str) -> str:
+    def validate_query_root(cls, value: str) -> str:
         normalized = str(value).strip().lower()
         normalized = normalized.replace("-", "").replace("_", "").replace(" ", "")
         if normalized in {"study", "studyroot"}:
             return "study"
         if normalized in {"patient", "patientroot"}:
             return "patient"
-        raise ValueError("query_retrieve_root must be 'study' or 'patient'")
+        raise ValueError("query_root must be 'study' or 'patient'")
 
     @model_validator(mode="after")
     def validate_calling_aet_config(self) -> "DicomConfiguration":

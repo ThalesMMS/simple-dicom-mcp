@@ -9,7 +9,7 @@ from mcp.server.fastmcp import Context, FastMCP
 
 from .attributes import ATTRIBUTE_PRESETS
 from .config import DicomConfiguration
-from .errors import DicomConfigurationError
+from .errors import DicomConfigurationError, DicomOperationError
 from .manifest import build_manifest
 from .server_tools_common import ToolDependencies
 
@@ -166,55 +166,8 @@ def register_core_tools(mcp: FastMCP, deps: ToolDependencies, server_name: str) 
         }
 
     @mcp.tool()
-    def switch_calling_aet(aet_name: str, ctx: Context = None) -> Dict[str, Any]:
-        """Switch the active calling AE title used for new associations.
-
-        This tool updates the local calling AE title used when establishing
-        associations with the current DICOM node. The requested AE title must
-        be defined in the configuration under calling_aets.
-
-        Args:
-            aet_name: The name, alias, or AE title of the calling AET to use
-
-        Returns:
-            Dictionary containing:
-            - success: Boolean indicating if the switch was successful
-            - message: Description of the operation result or error
-
-        Raises:
-            ValueError: If no calling AETs are configured or the name is unknown
-        """
-        dicom_ctx = ctx.request_context.lifespan_context
-        config: DicomConfiguration = dicom_ctx.config
-
-        logger.info(
-            deps.format_log_event(
-                "switch_calling_aet",
-                config,
-                target_calling_aet=aet_name,
-            )
-        )
-
-        try:
-            resolved_name, calling_aet = config.resolve_calling_aet(aet_name)
-            config.calling_aet = resolved_name
-        except Exception as exc:
-            return deps.tool_error_response(
-                "switch_calling_aet",
-                config,
-                DicomConfigurationError(str(exc)),
-            )
-
-        return {
-            "success": True,
-            "message": (
-                f"Switched calling AE title to: {calling_aet.ae_title} ({resolved_name})"
-            ),
-        }
-
-    @mcp.tool()
     def verify_connection(ctx: Context = None) -> Dict[str, Any]:
-        """Verify connectivity to the current DICOM node using C-ECHO.
+        """Verify connectivity to the DICOM node using C-ECHO.
 
         This tool performs a DICOM C-ECHO operation (similar to a network ping) to check
         if the currently selected DICOM node is reachable and responds correctly. This is
@@ -225,36 +178,35 @@ def register_core_tools(mcp: FastMCP, deps: ToolDependencies, server_name: str) 
             - success: Boolean indicating if the connection succeeded
             - message: Description of the connection status
             - details: Connection details (node, host, port, AE titles)
-
-        Example:
-            {
-                "success": true,
-                "message": "Connection successful to 192.168.1.100:104 (Called AE: ORTHANC, Calling AE: CLIENT)",
-                "details": {
-                    "node_name": "orthanc",
-                    "host": "192.168.1.100",
-                    "port": 104,
-                    "called_ae_title": "ORTHANC",
-                    "calling_ae_title": "CLIENT"
-                }
-            }
         """
         dicom_ctx = ctx.request_context.lifespan_context
-        config = dicom_ctx.config
-        client = deps.create_client(config)
-
-        success, message = client.verify_connection()
-        return {
-            "success": success,
-            "message": message,
-            "details": {
-                "node_name": config.current_node,
-                "host": client.host,
-                "port": client.port,
-                "called_ae_title": client.called_aet,
-                "calling_ae_title": client.calling_aet,
-            },
+        config: DicomConfiguration = dicom_ctx.config
+        current_node = config.nodes[config.current_node]
+        details = {
+            "node_name": config.current_node,
+            "host": current_node.host,
+            "port": current_node.port,
+            "called_ae_title": current_node.ae_title,
+            "calling_ae_title": config.calling_aet_title,
         }
+
+        logger.info(deps.format_log_event("verify_connection", config))
+
+        try:
+            client = deps.create_client(config)
+            success, message = client.verify_connection()
+            return {
+                "success": success,
+                "message": message,
+                "details": details,
+            }
+        except Exception as exc:
+            return deps.tool_error_response(
+                "verify_connection",
+                config,
+                DicomOperationError(f"Connection verification failed: {str(exc)}"),
+                base_payload={"details": details},
+            )
 
     @mcp.tool()
     def get_attribute_presets() -> Dict[str, Dict[str, List[str]]]:

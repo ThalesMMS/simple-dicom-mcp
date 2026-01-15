@@ -9,12 +9,9 @@ ATTRIBUTE_PRESETS = {
     # Minimal attribute set - just essential identifiers
     "minimal": {
         "patient": [
-            "PatientID",
-            "PatientName",
         ],
         "study": [
             "StudyInstanceUID",
-            "PatientID",
             "StudyDate",
             "StudyDescription",
         ],
@@ -34,16 +31,12 @@ ATTRIBUTE_PRESETS = {
     # Standard attribute set - common clinical attributes
     "standard": {
         "patient": [
-            "PatientID",
-            "PatientName",
             "PatientBirthDate",
             "PatientSex",
             "PatientAge",
         ],
         "study": [
             "StudyInstanceUID",
-            "PatientID",
-            "PatientName",
             "PatientBirthDate",
             "PatientSex",
             "StudyDate",
@@ -80,8 +73,6 @@ ATTRIBUTE_PRESETS = {
     # Extended attribute set - comprehensive information
     "extended": {
         "patient": [
-            "PatientID",
-            "PatientName",
             "PatientBirthDate",
             "PatientSex",
             "PatientAge",
@@ -93,8 +84,6 @@ ATTRIBUTE_PRESETS = {
         ],
         "study": [
             "StudyInstanceUID",
-            "PatientID",
-            "PatientName",
             "PatientBirthDate",
             "PatientSex",
             "StudyDate",

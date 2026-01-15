@@ -14,21 +14,14 @@ REQUIRED_TOOL_VERSIONS: Dict[str, str] = {
     "list_dicom_nodes": "1.0",
     "query_studies": "2.0",
     "query_series": "2.0",
-    "move_study": "1.0",
 }
 
 OPTIONAL_TOOL_VERSIONS: Dict[str, str] = {
     "get_manifest": "1.0",
     "switch_dicom_node": "1.0",
-    "switch_calling_aet": "1.0",
     "verify_connection": "2.0",
-    "extract_pdf_text_from_dicom": "1.2",
     "query_patients": "2.0",
     "query_instances": "2.0",
-    "download_studies": "1.1",
-    "download_series": "1.1",
-    "download_instances": "1.1",
-    "move_series": "1.0",
     "get_attribute_presets": "1.0",
 }
 

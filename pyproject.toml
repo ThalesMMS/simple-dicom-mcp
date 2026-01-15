@@ -1,7 +1,7 @@
 [project]
 name = "dicom-mcp"
 version = "0.1.1"
-description = "MCP server for querying DICOM metadata, moving studies, and downloading exams"
+description = "MCP server for querying DICOM metadata"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -10,7 +10,6 @@ dependencies = [
     "pynetdicom>=2.1.1",
     "pydicom>=2.4.0",
     "pydantic>=2.0.0",
-    "pypdf>=3.0.0",
     "pyyaml>=6.0.2",
 ]
 

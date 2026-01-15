@@ -92,67 +92,6 @@ def main():
     print(f"Found {len(instances)} instances")
     instance_uid = instances[0]["SOPInstanceUID"]
     print(f"Using instance UID: {instance_uid}")
-    
-    # # Add the retrieve_instance method to DicomClient
-    # # (Copy the method provided above to dicom_client.py first)
-    
-    # # Retrieve the instance
-    # # test_dicom_client.py
-    # # ... (keep everything else the same, just replace the retrieve_instance call)
-
-    # Retrieve the instance using C-MOVE
-    print("\nRetrieving instance using C-MOVE...")
-    output_dir = "./dicom_test_download"
-    result = client.retrieve_instance_move(
-        study_instance_uid=study_uid,
-        series_instance_uid=series_uid,
-        sop_instance_uid=instance_uid,
-        output_dir=output_dir
-    )
-    
-    print(f"Retrieval success: {result['success']}")
-    print(f"Message: {result['message']}")
-    if result['success']:
-        print(f"File saved to: {result['file_path']}")
-    
-    # print(f"Retrieval success: {result['success']}")
-    # print(f"Message: {result['message']}")
-    # if result['success']:
-    #     print(f"File saved to: {result['file_path']}")
-
-
-    # # After the C-MOVE test, add:
-    # print("\nRetrying with movescu...")
-    # result = client.retrieve_using_movescu(
-    #     study_instance_uid=study_uid,
-    #     series_instance_uid=series_uid,
-    #     sop_instance_uid=instance_uid,
-    #     output_dir="./dicom_movescu_download"
-    # )
-
-    # print(f"Retrieval success: {result['success']}")
-    # print(f"Message: {result['message']}")
-    # if result['success']:
-    #     print(f"File saved to: {result['file_path']}")
-    # else:
-    #     print(f"Command output: {result.get('stdout', '')}")
-    #     print(f"Command errors: {result.get('stderr', '')}")
-
-    # # Retrieve the instance
-    # print("\nRetrieving instance...")
-    # output_dir = "./dicom_test_download"
-    # result = client.retrieve_instance(
-    #     study_instance_uid=study_uid,
-    #     series_instance_uid=series_uid,
-    #     sop_instance_uid=instance_uid,
-    #     output_dir=output_dir
-    # )
-    
-    # print(f"Retrieval success: {result['success']}")
-    # print(f"Message: {result['message']}")
-    # if result['success']:
-    #     print(f"File saved to: {result['file_path']}")
-
 
 if __name__ == "__main__":
     main()

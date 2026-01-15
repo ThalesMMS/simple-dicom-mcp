@@ -14,7 +14,6 @@ class ToolDependencies:
     """Dependencies shared across tool modules."""
 
     create_client: Callable[[DicomConfiguration], DicomClient]
-    download_root: Callable[[DicomConfiguration], str]
     format_log_event: Callable[..., str]
     tool_error_response: Callable[
         [str, DicomConfiguration | None, Exception, Dict[str, Any] | None],

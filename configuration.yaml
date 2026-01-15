@@ -33,8 +33,8 @@ calling_aets:
 # Currently selected calling AE title
 calling_aet: "default"
  
-# Query/Retrieve root selection ("study" or "patient")
-query_retrieve_root: "study"
+# Query root selection ("study" or "patient")
+query_root: "study"
  
 # Network timeouts and PDU size
 network:
@@ -43,20 +43,8 @@ network:
   network_timeout: 30
   assoc_timeout: 10
   max_pdu: 16384
-  storage_contexts: "all"
   retry:
     max_attempts: 2
     backoff_seconds: 1.0
     backoff_multiplier: 2.0
     backoff_max_seconds: 5.0
- 
-# Storage configuration
-# Replaces legacy 'download_directory'
-storage:
-  path: "./downloads"
-  retention_days: 30       # Automatically delete files older than 30 days (0 to disable)
-  dir_permissions: "0o700"  # Directory permissions (octal): owner read/write/execute
-  file_permissions: "0o600" # File permissions (octal): owner read/write only
- 
-# Legacy setting (optional, storage.path is preferred)
-# download_directory: "./downloads"

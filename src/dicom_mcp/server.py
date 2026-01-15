@@ -5,8 +5,6 @@ DICOM MCP Server main implementation.
 import logging
 import os
 import sys
-import time
-from pathlib import Path
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from typing import Any, AsyncIterator, Dict, List
@@ -20,7 +18,6 @@ from .server_prompt import register_prompts
 from .server_tools_common import ToolDependencies
 from .server_tools_core import register_core_tools
 from .server_tools_queries import register_query_tools
-from .server_tools_transfers import register_transfer_tools
 
 # Configure logging
 logger = logging.getLogger("dicom_mcp")
@@ -33,35 +30,6 @@ class DicomContext:
     config: DicomConfiguration
 
 
-def cleanup_old_files(
-    root_dir: str,
-    max_age_days: int,
-    managed_subdirs: tuple[str, ...] = ("studies", "reports"),
-) -> int:
-    """Delete files older than max_age_days under managed subdirectories."""
-    if max_age_days <= 0:
-        return 0
-    count = 0
-    cutoff = time.time() - (max_age_days * 86400)
-    root = Path(root_dir)
-    if not root.exists():
-        return 0
-    for subdir in managed_subdirs:
-        base = root / subdir
-        if not base.exists():
-            continue
-        for path in base.rglob("*"):
-            if path.is_file():
-                try:
-                    if path.stat().st_mtime < cutoff:
-                        path.unlink()
-                        count += 1
-                        logger.debug("Retention policy: Deleted old file %s", path)
-                except Exception as exc:
-                    logger.exception("Failed to delete old file %s: %s", path, exc)
-    return count
-
-
 def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMCP:
     """Create and configure a DICOM MCP server."""
 
@@ -72,16 +40,6 @@ def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMC
             logger.setLevel(level)
             logging.getLogger("dicom_mcp.dicom_client").setLevel(level)
 
-    def _download_root_from_config(config: DicomConfiguration) -> str:
-        """Resolve a writable download directory from configuration or default.
-        Does not mutate config; ensures directory exists and returns absolute path.
-        """
-        root = config.download_path
-        root = os.path.abspath(os.path.expanduser(root))
-        os.makedirs(root, exist_ok=True)
-        DicomClient._apply_permissions(root, config.storage.dir_permissions)
-        return root
-
     def _create_client_from_config(config: DicomConfiguration) -> DicomClient:
         """Create a new DICOM client for the current configuration."""
         current_node = config.nodes[config.current_node]
@@ -90,7 +48,7 @@ def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMC
             port=current_node.port,
             calling_aet=config.calling_aet_title,
             called_aet=current_node.ae_title,
-            query_retrieve_root=config.query_retrieve_root,
+            query_root=config.query_root,
             network=config.network,
             node_name=config.current_node,
         )
@@ -163,26 +121,6 @@ def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMC
 
         logger.info(_format_log_event("config_loaded", config))
 
-        download_root = _download_root_from_config(config)
-        retention_days = config.storage.retention_days
-        if retention_days > 0:
-            logger.info(
-                _format_log_event(
-                    "retention_cleanup_start",
-                    config,
-                    retention_days=retention_days,
-                )
-            )
-            deleted_count = cleanup_old_files(download_root, retention_days)
-            if deleted_count > 0:
-                logger.info(
-                    _format_log_event(
-                        "retention_cleanup_complete",
-                        config,
-                        deleted_count=deleted_count,
-                    )
-                )
-
         yield DicomContext(config=config)
 
     # Create server
@@ -190,14 +128,12 @@ def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMC
 
     deps = ToolDependencies(
         create_client=_create_client_from_config,
-        download_root=_download_root_from_config,
         format_log_event=_format_log_event,
         tool_error_response=_tool_error_response,
     )
 
     register_core_tools(mcp, deps, server_name=name)
     register_query_tools(mcp, deps)
-    register_transfer_tools(mcp, deps)
     register_prompts(mcp)
 
     return mcp

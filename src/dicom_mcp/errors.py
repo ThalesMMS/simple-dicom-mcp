@@ -32,7 +32,3 @@ class DicomOperationError(DicomError):
 
 class DicomConfigurationError(DicomError):
     """Raised when configuration is invalid or missing."""
-
-
-class StorageSecurityError(DicomError):
-    """Raised when storage path validation fails."""

@@ -1,12 +1,3 @@
-## Overview
-
-This is my fork of dicom-mcp focused on a simple, practical goal: query DICOM metadata, download exams, and prepare files for anonymization. Credit to Christian Hinge for the original server; I added the download tools, tested with Claude Desktop.
-
-Key additions
-- Download tools: `download_studies`, `download_series`, `download_instances`
-- Works out‑of‑the‑box with Orthanc; saves to `./downloads` (git‑ignored)
-- Keeps upstream features: query, move (C‑MOVE), and PDF text extraction
-
 Repo credit: https://github.com/ChristianHinge/dicom-mcp
 
 ## Run it
@@ -36,7 +27,7 @@ calling_aets:
     description: "Default calling AE"
 
 calling_aet: "default"
-query_retrieve_root: "study"
+query_root: "study"
 
 network:
   acse_timeout: 10
@@ -44,18 +35,12 @@ network:
   network_timeout: 30
   assoc_timeout: 10
   max_pdu: 16384
-  storage_contexts: "all"
   retry:
     max_attempts: 2
     backoff_seconds: 1.0
     backoff_multiplier: 2.0
     backoff_max_seconds: 5.0
 
-storage:
-  path: "./downloads"
-  retention_days: 30
-  dir_permissions: "0o700"
-  file_permissions: "0o600"
 ```
 
 - Start server (dev):
@@ -94,12 +79,9 @@ WSL tips
 
 ## Tools you can call
 
-- Connection: `list_dicom_nodes`, `switch_dicom_node`, `switch_calling_aet`, `verify_connection`
+- Connection: `list_dicom_nodes`, `switch_dicom_node`, `verify_connection`
 - Registry: `get_manifest`
 - Query: `query_patients`, `query_studies`, `query_series`, `query_instances`, `get_attribute_presets`
-- Transfer: `move_study`, `move_series`
-- Downloads (this fork): `download_studies`, `download_series`, `download_instances`
-- Reports: `extract_pdf_text_from_dicom`
 
 Query tools return structured status metadata:
 ```json
@@ -124,35 +106,8 @@ query_studies(study_date="20230101-20231231")
 query_studies(patient_name="*TEST*", patient_sex="O", patient_birth_date="19700101")
 ```
 
-- Download two studies to `./downloads`:
-```
-download_studies([
-  "1.2.826.0.1.3680043.8.1055.1.20111102150758591.92402465.76095170",
-  "1.2.826.0.1.3680043.8.1055.1.20111103111148288.98361414.79379639"
-])
-```
-
-- Extract text from a DICOM encapsulated PDF:
-```
-extract_pdf_text_from_dicom(
-  study_instance_uid="...",
-  series_instance_uid="...",
-  sop_instance_uid="...",
-  keep_files=True,
-)
-```
-The response includes `pdf_metadata` with page count, PDF size, and whether extracted text was empty.
-
-## Downloads → anonymization
-
-Files are saved to `./downloads` by default. Configure `storage.path` to change the root (legacy `download_directory` is still supported).
-`storage.retention_days` cleans old files on startup (set to `0` to disable), and `storage.dir_permissions`/`storage.file_permissions` control permissions.
-Downloads are organized as `downloads/studies/<StudyInstanceUID>/series/<SeriesInstanceUID>/...`, each with a `manifest.json` containing UIDs, file paths, timestamps, and source node metadata.
-PDF extraction uses temporary files by default; set `keep_files=True` to persist them under `./downloads/reports/<sop_uid>_<timestamp>`.
-
 ## Troubleshooting
 
-- If downloads fail with association errors, ensure the server allows C‑GET/C‑STORE back to this AE.
 - If uv doesn’t reflect code changes, add `--no-cache` or `--reinstall-package dicom-mcp`.
 - On WSL/Windows, enable mirrored networking so `localhost` works across Windows and WSL.
 
@@ -165,7 +120,7 @@ PDF extraction uses temporary files by default; set `keep_files=True` to persist
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
  [![PyPI Version](https://img.shields.io/pypi/v/dicom-mcp.svg)](https://pypi.org/project/dicom-mcp/) [![PyPI Downloads](https://img.shields.io/pypi/dm/dicom-mcp.svg)](https://pypi.org/project/dicom-mcp/)  
 
-The `dicom-mcp` server enables AI assistants to query, read, and move data on DICOM servers (PACS, VNA, etc.). 
+The `dicom-mcp` server enables AI assistants to query and read data on DICOM servers (PACS, VNA, etc.). 
 
 <div align="center">
 
@@ -175,33 +130,12 @@ The `dicom-mcp` server enables AI assistants to query, read, and move data on DI
 
 </div>
 
-```text
----------------------------------------------------------------------
-🧑‍⚕️ User: "Any significant findings in John Doe's previous CT report?"
-
-🧠 LLM → ⚙️ Tools:
-   query_patients → query_studies → query_series → extract_pdf_text_from_dicom
-
-💬 LLM Response: "The report from 2025-03-26 mentions a history of splenomegaly (enlarged spleen)"
-
-🧑‍⚕️ User: "What's the volume of his spleen at the last scan and the scan today?"
-
-🧠 LLM → ⚙️ Tools:
-   (query_studies → query_series → move_series → query_series → extract_pdf_text_from_dicom) x2
-   (The move_series tool sends the latest CT to a DICOM segmentation node, which returns volume PDF report)
-
-💬 LLM Response: "last year 2024-03-26: 412cm³, today 2025-04-10: 350cm³"
----------------------------------------------------------------------
-```
-
 
 ## ✨ Core Capabilities
 
 `dicom-mcp` provides tools to:
 
 * **🔍 Query Metadata**: Search for patients, studies, series, and instances using various criteria.
-* **📄 Read DICOM Reports (PDF)**: Retrieve DICOM instances containing encapsulated PDFs (e.g., clinical reports) and extract the text content.
-* **➡️ Send DICOM Images**: Send series or studies to other DICOM destinations, e.g. AI endpoints for image segmentation, classification, etc.
 * **⚙️ Utilities**: Manage connections and understand query options.
 
 ## 🚀 Quick Start
@@ -249,7 +183,7 @@ calling_aets:
     description: "Default calling AE"
 
 calling_aet: "default"
-query_retrieve_root: "study"
+query_root: "study"
 
 network:
   acse_timeout: 10
@@ -257,23 +191,16 @@ network:
   network_timeout: 30
   assoc_timeout: 10
   max_pdu: 16384
-  storage_contexts: "all"
   retry:
     max_attempts: 2
     backoff_seconds: 1.0
     backoff_multiplier: 2.0
     backoff_max_seconds: 5.0
 
-storage:
-  path: "./downloads"
-  retention_days: 30
-  dir_permissions: "0o700"
-  file_permissions: "0o600"
 ```
 Notes:
 - `calling_aet` can be a name, alias, or AE title defined in `calling_aets`.
-- `query_retrieve_root` accepts `study` or `patient`.
-- `network.storage_contexts` supports `all` (default) or `core` for common modalities.
+- `query_root` accepts `study` or `patient`.
 > [!WARNING]
 DICOM-MCP is not meant for clinical use, and should not be connected with live hospital databases or databases with patient-sensitive data. Doing so could lead to both loss of patient data, and leakage of patient data onto the internet. DICOM-MCP can be used with locally hosted open-weight LLMs for complete data privacy. 
 
@@ -292,7 +219,7 @@ Start Orthanc and run tests:
 cd tests
 docker compose up -d
 cd ..
-uv run pytest -m integration  # uploads dummy pdf data to ORTHANC server
+uv run pytest -m integration
 ```
 
 UI at [http://localhost:8042](http://localhost:8042)
@@ -342,26 +269,11 @@ For development:
 * **`query_studies`**: Find studies using patient ID, date, modality, description, accession number, or Study UID.
 * **`query_series`**: Locate series within a specific study using modality, series number/description, or Series UID.
 * **`query_instances`**: Find individual instances (images/objects) within a series using instance number or SOP Instance UID
-### 📄 Read DICOM Reports (PDF)
-
-* **`extract_pdf_text_from_dicom`**: Retrieve a specific DICOM instance containing an encapsulated PDF and extract its text content.
-
-### ➡️ Send DICOM Images
-
-* **`move_series`**: Send a specific DICOM series to another configured DICOM node using C-MOVE.
-* **`move_study`**: Send an entire DICOM study to another configured DICOM node using C-MOVE.
-
-### 📥 Downloads
-
-* **`download_studies`**: Download one or more studies to the local storage root.
-* **`download_series`**: Download one or more series within a study.
-* **`download_instances`**: Download specific instances within a series.
 
 ### ⚙️ Utilities
 
 * **`list_dicom_nodes`**: Show the currently active DICOM node, calling AE title, and list all configured nodes.
 * **`switch_dicom_node`**: Change the active DICOM node for subsequent operations.
-* **`switch_calling_aet`**: Change the calling AE title used for new associations.
 * **`verify_connection`**: Test the DICOM network connection to the currently active node using C-ECHO.
 * **`get_attribute_presets`**: List the available levels of detail (minimal, standard, extended) for metadata query results.<p>
 * **`get_manifest`**: Return the MCP tool contract manifest (required/optional tool versions).
@@ -437,4 +349,3 @@ uv run pre-commit run --all-files
 ## 🙏 Acknowledgments
 
 * Built using [pynetdicom](https://github.com/pydicom/pynetdicom)
-* Uses [pypdf](https://pypi.org/project/pypdf/) for PDF text extraction

@@ -9,26 +9,12 @@ import socket
 import time
 from typing import Any, Callable, List, Optional
 
-from pynetdicom import AE, build_role
+from pynetdicom import AE
 from pynetdicom.sop_class import (
-    PatientRootQueryRetrieveInformationModelFind,
-    StudyRootQueryRetrieveInformationModelFind,
-    PatientRootQueryRetrieveInformationModelGet,
-    PatientRootQueryRetrieveInformationModelMove,
-    StudyRootQueryRetrieveInformationModelGet,
-    StudyRootQueryRetrieveInformationModelMove,
+    PatientRootQueryInformationModelFind,
+    StudyRootQueryInformationModelFind,
     Verification,
-    EncapsulatedPDFStorage,
 )
-
-# Compatibility shim for storage presentation contexts across pynetdicom versions
-try:
-    from pynetdicom.sop_class import AllStoragePresentationContexts as _ALL_STORAGE_CONTEXTS  # type: ignore
-except Exception:
-    try:
-        from pynetdicom.sop_class import StoragePresentationContexts as _ALL_STORAGE_CONTEXTS  # type: ignore
-    except Exception:
-        _ALL_STORAGE_CONTEXTS = None  # Will fall back to scanning SOP classes
 
 from .config import NetworkConfig
 from .errors import (
@@ -55,7 +41,7 @@ class DicomClientBase:
         port: int,
         calling_aet: str,
         called_aet: str,
-        query_retrieve_root: str = "study",
+        query_root: str = "study",
         network: Optional[NetworkConfig] = None,
         node_name: Optional[str] = None,
     ):
@@ -66,7 +52,7 @@ class DicomClientBase:
             port: DICOM node port
             calling_aet: Local AE title (our AE title)
             called_aet: Remote AE title (the node we're connecting to)
-            query_retrieve_root: Query/Retrieve root (study or patient)
+            query_root: Query root (study or patient)
             network: Network configuration for timeouts and PDU sizing
             node_name: Optional configured node name for logging
         """
@@ -75,7 +61,7 @@ class DicomClientBase:
         self.called_aet = called_aet
         self.calling_aet = calling_aet
         self.node_name = node_name
-        self.query_retrieve_root = self._normalize_query_retrieve_root(query_retrieve_root)
+        self.query_root = self._normalize_query_root(query_root)
         self.network = network or NetworkConfig()
 
         # Create the Application Entity
@@ -84,97 +70,29 @@ class DicomClientBase:
 
         # Add the necessary presentation contexts
         self.ae.add_requested_context(Verification)
-        self._configure_query_retrieve_contexts()
-
-        # Add storage presentation contexts and enable SCP role negotiation.
-        self._configure_storage_contexts()
+        self._configure_query_contexts()
 
     @staticmethod
-    def _normalize_query_retrieve_root(value: str) -> str:
+    def _normalize_query_root(value: str) -> str:
         normalized = str(value).strip().lower()
         normalized = normalized.replace("-", "").replace("_", "").replace(" ", "")
         if normalized in {"study", "studyroot"}:
             return "study"
         if normalized in {"patient", "patientroot"}:
             return "patient"
-        raise DicomConfigurationError("query_retrieve_root must be 'study' or 'patient'")
+        raise DicomConfigurationError("query_root must be 'study' or 'patient'")
 
-    def _configure_query_retrieve_contexts(self) -> None:
-        if self.query_retrieve_root == "patient":
-            self._find_model = PatientRootQueryRetrieveInformationModelFind
-            self._get_model = PatientRootQueryRetrieveInformationModelGet
-            self._move_model = PatientRootQueryRetrieveInformationModelMove
+    def _configure_query_contexts(self) -> None:
+        if self.query_root == "patient":
+            self._find_model = PatientRootQueryInformationModelFind
         else:
-            self._find_model = StudyRootQueryRetrieveInformationModelFind
-            self._get_model = StudyRootQueryRetrieveInformationModelGet
-            self._move_model = StudyRootQueryRetrieveInformationModelMove
+            self._find_model = StudyRootQueryInformationModelFind
 
         self.ae.add_requested_context(self._find_model)
-        self.ae.add_requested_context(self._get_model)
-        self.ae.add_requested_context(self._move_model)
-        if self.query_retrieve_root != "patient":
+        if self.query_root != "patient":
             # Patient-level C-FIND requires Patient Root even when Study Root is selected.
-            self.ae.add_requested_context(PatientRootQueryRetrieveInformationModelFind)
+            self.ae.add_requested_context(PatientRootQueryInformationModelFind)
 
-    def _configure_storage_contexts(self) -> None:
-        # Include storage SOP classes for C-GET/C-STORE operations.
-        self.storage_roles = []
-        added_storage_uids = set()
-
-        def _add_storage_uid(uid_val):
-            if uid_val in added_storage_uids:
-                return
-            added_storage_uids.add(uid_val)
-            self.ae.add_requested_context(uid_val)
-            self.storage_roles.append(build_role(uid_val, scp_role=True))
-
-        mode = self.network.storage_contexts
-        if mode == "core":
-            try:
-                import pynetdicom.sop_class as sc
-                core_names = [
-                    "CTImageStorage",
-                    "MRImageStorage",
-                    "UltrasoundImageStorage",
-                    "UltrasoundMultiFrameImageStorage",
-                    "CRImageStorage",
-                    "SecondaryCaptureImageStorage",
-                    "EncapsulatedPDFStorage",
-                ]
-                for name in core_names:
-                    uid_val = getattr(sc, name, None)
-                    if uid_val is not None:
-                        _add_storage_uid(uid_val)
-            except Exception:
-                _add_storage_uid(EncapsulatedPDFStorage)
-        else:
-            if _ALL_STORAGE_CONTEXTS is not None:
-                for ctx in _ALL_STORAGE_CONTEXTS:
-                    abstract_syntax = getattr(ctx, "abstract_syntax", ctx)
-                    _add_storage_uid(abstract_syntax)
-            else:
-                try:
-                    # Fallback: scan sop_class module for all *Storage UIDs
-                    from pydicom.uid import UID
-                    import pynetdicom.sop_class as sc
-                    for name in dir(sc):
-                        if not name.endswith("Storage"):
-                            continue
-                        try:
-                            val = getattr(sc, name)
-                        except Exception:
-                            continue
-                        if isinstance(val, UID):
-                            _add_storage_uid(val)
-                except Exception:
-                    # As a last resort, at least include EncapsulatedPDFStorage
-                    _add_storage_uid(EncapsulatedPDFStorage)
-
-        logger.info(
-            "Configured %s storage presentation contexts (mode=%s)",
-            len(added_storage_uids),
-            mode,
-        )
 
     def _apply_network_config(self, network: NetworkConfig) -> None:
         self._set_ae_attribute(["acse_timeout"], network.acse_timeout)

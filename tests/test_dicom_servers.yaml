@@ -8,7 +8,7 @@ nodes:
     host: "localhost"
     port: 104
     ae_title: MONAI-DEPLOY
-    description: "CT Organ segmentation server. If a CT series is sent here, the organs will be segmented and a DICOM pdf with organ volumes will be returned"
+    description: "CT Organ segmentation server."
 
 # Local calling AE titles
 calling_aet: "MCPSCU"

@@ -27,12 +27,7 @@ This DICOM Model Context Protocol (MCP) server allows you to interact with medic
    switch_dicom_node(node_name="research")
    ```
 
-3. Switch to a different calling AE title:
-   ```
-   switch_calling_aet(aet_name="modality")
-   ```
-
-4. Verify the connection:
+3. Verify the connection:
    ```
    verify_connection()
    ```
@@ -95,38 +90,4 @@ To view available attribute presets:
 ```
 get_attribute_presets()
 ```
-
-## Study/Series Transfer
-Move DICOM objects to a configured destination DICOM node.
-
-**IMPORTANT**: `move_study` and `move_series` require a specific UID. They do NOT accept
-search filters. You must FIRST query for matching studies/series, THEN move each result.
-
-### Correct Workflow (Query then Move):
-```
-# Step 1: Query for studies matching your criteria
-results = query_studies(
-    study_date="20000101-20221231",
-    modality_in_study="CT",
-    study_description="*CHEST*"
-)
-
-# Step 2: Move each matching study by its StudyInstanceUID
-for study in results:
-    move_study(
-        destination_node="radiant",
-        study_instance_uid=study["StudyInstanceUID"]
-    )
-```
-
-### Move Tool Signatures:
-```
-# Move a whole study (requires StudyInstanceUID from query)
-move_study(destination_node="radiant", study_instance_uid="1.2.840...")
-
-# Move a single series (requires SeriesInstanceUID from query)
-move_series(destination_node="radiant", series_instance_uid="1.2.840...")
-```
-
-Node names are case-insensitive (e.g., "RADIANT", "radiant", "Radiant" all work).
 """
