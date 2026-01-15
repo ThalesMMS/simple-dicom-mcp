@@ -83,6 +83,13 @@ query_studies(patient_id="*123*")           # ID contains "123"
 query_series(series_description="*AXIAL*")  # Contains "AXIAL"
 ```
 
+## Custom Filters
+Use the `filters` parameter to filter by ANY DICOM tag, not just the predefined ones:
+```
+query_studies(filters={"RequestedProcedureDescription": "*CHEST*ANGIO*"})
+query_studies(study_date="20200101-20221231", filters={"InstitutionName": "*HOSPITAL*"})
+```
+
 ## Attribute Presets
 For all queries, you can specify an attribute preset:
 - `none`: No attributes, use with additional_attributes (default)

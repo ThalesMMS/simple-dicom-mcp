@@ -100,6 +100,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         attribute_preset: str = "none",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
+        filters: Dict[str, str] = None,
         ctx: Context = None,
     ) -> Dict[str, Any]:
         """Query studies matching the specified criteria from the DICOM node.
@@ -129,6 +130,9 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
+            filters: Dictionary of DICOM tag names to filter values. Use this to filter by
+                any DICOM attribute not in the standard parameters. Supports wildcards.
+                Example: {"RequestedProcedureDescription": "*CHEST*ANGIO*"}
 
         Returns:
             Dictionary containing query results and status metadata. The results list includes
@@ -161,6 +165,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 attribute_preset=attribute_preset,
                 additional_attrs=additional_attributes,
                 exclude_attrs=exclude_attributes,
+                filters=filters,
             )
         except Exception as exc:
             return deps.tool_error_response(

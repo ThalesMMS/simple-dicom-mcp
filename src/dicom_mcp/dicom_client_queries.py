@@ -183,6 +183,7 @@ class DicomClientQueryMixin:
         attribute_preset: str = "none",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
+        filters: Dict[str, str] = None,
     ) -> Dict[str, Any]:
         """Query for studies matching criteria."""
         self._log_event(
@@ -218,6 +219,11 @@ class DicomClientQueryMixin:
 
         if study_instance_uid:
             ds.StudyInstanceUID = study_instance_uid
+
+        # Add custom filters for any DICOM tag
+        if filters:
+            for tag_name, tag_value in filters.items():
+                setattr(ds, tag_name, tag_value)
 
         # Add attributes based on preset
         attrs = get_attributes_for_level("study", attribute_preset, additional_attrs, exclude_attrs)
