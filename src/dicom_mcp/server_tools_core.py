@@ -214,7 +214,7 @@ def register_core_tools(mcp: FastMCP, deps: ToolDependencies, server_name: str) 
 
         This tool returns the defined attribute presets that can be used with the
         query_* functions. It shows which DICOM attributes are included in each
-        preset (minimal, standard, extended, custom) for each query level.
+        preset (none, custom) for each query level.
 
         Returns:
             Dictionary organized by query level (patient, study, series, instance),
@@ -223,18 +223,37 @@ def register_core_tools(mcp: FastMCP, deps: ToolDependencies, server_name: str) 
 
         Example:
             {
-                "patient": {
-                    "minimal": ["PatientID"],
-                    "standard": ["PatientID", "PatientBirthDate", "PatientSex"],
-                    "extended": ["PatientID", "PatientBirthDate", "PatientSex", ...],
-                    "custom": ["PatientID"]
-                },
-                "study": {
-                    "minimal": ["StudyInstanceUID", "StudyDate"],
-                    "standard": ["StudyInstanceUID", "StudyDate", "StudyDescription", ...],
-                    "extended": ["StudyInstanceUID", "StudyDate", "StudyDescription", ...]
-                    "custom": ["StudyInstanceUID", "StudyDate", "StudyDescription", ...]
-                },
+                "patient": [
+                    "PatientID",
+                    "PatientBirthDate",
+                    "PatientSex",
+                    "PatientAge",
+                ],
+                "study": [
+                    "StudyInstanceUID",
+                    "PatientID",
+                    "AccessionNumber",
+                    "StudyDescription",
+                    "PatientBirthDate",
+                    "PatientSex",
+                    "PatientAge",
+                    "StudyDate",
+                    "RequestedProcedureDescription",
+                    "RequestedProcedureCodeSequence",
+                ],
+                "series": [
+                    "SeriesInstanceUID",
+                    "StudyInstanceUID",
+                    "Modality",
+                    "SeriesDescription",
+                    "BodyPartExamined",
+                    "ProtocolName",
+                    "RequestAttributesSequence",
+                ],
+                "instance": [
+                    "SOPInstanceUID",
+                    "SeriesInstanceUID",
+                    ],
                 ...
             }
         """

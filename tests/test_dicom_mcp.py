@@ -326,10 +326,9 @@ def test_get_attribute_presets():
     
     assert ATTRIBUTE_PRESETS is not None
     assert isinstance(ATTRIBUTE_PRESETS, dict)
-    assert "minimal" in ATTRIBUTE_PRESETS
-    assert "standard" in ATTRIBUTE_PRESETS
-    assert "extended" in ATTRIBUTE_PRESETS
+    assert "none" in ATTRIBUTE_PRESETS
     assert "custom" in ATTRIBUTE_PRESETS
+    assert len(ATTRIBUTE_PRESETS) == 2
 
 
 def test_create_server():

@@ -17,7 +17,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
     def query_patients(
         patient_id: str = "",
         birth_date: str = "",
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -32,9 +32,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
             patient_id: Patient ID to search for, e.g., "12345678"
             birth_date: Patient birth date in YYYYMMDD format, e.g., "19700101"
             attribute_preset: Controls which attributes to include in results:
-                - "minimal": Only essential attributes
-                - "standard": Common attributes (default)
-                - "extended": All available attributes
+                - "none": No attributes, use with additional_attributes (default)
                 - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
@@ -99,7 +97,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         accession_number: str = "",
         study_instance_uid: str = "",
         limit: int | None = None,
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -125,9 +123,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
             study_instance_uid: Unique identifier for a specific study
             limit: Maximum number of results to return (None = no limit)
             attribute_preset: Controls which attributes to include in results:
-                - "minimal": Only essential attributes
-                - "standard": Common attributes (default)
-                - "extended": All available attributes
+                - "none": No attributes, use with additional_attributes (default)
                 - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
@@ -184,7 +180,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         series_description: str = "",
         series_instance_uid: str = "",
         limit: int | None = None,
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -203,9 +199,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
             series_instance_uid: Unique identifier for a specific series
             limit: Maximum number of results to return (None = no limit)
             attribute_preset: Controls which attributes to include in results:
-                - "minimal": Only essential attributes
-                - "standard": Common attributes (default)
-                - "extended": All available attributes
+                - "none": No attributes, use with additional_attributes (default)
                 - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
@@ -256,7 +250,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         series_instance_uid: str,
         instance_number: str = "",
         sop_instance_uid: str = "",
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -272,9 +266,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
             instance_number: Filter by specific instance number within the series
             sop_instance_uid: Unique identifier for a specific instance
             attribute_preset: Controls which attributes to include in results:
-                - "minimal": Only essential attributes
-                - "standard": Common attributes (default)
-                - "extended": All available attributes
+                - "none": No attributes, use with additional_attributes (default)
                 - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results

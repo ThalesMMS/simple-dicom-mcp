@@ -6,96 +6,15 @@ from typing import Dict, List, Optional
 
 # Dictionary of attribute presets for each query level
 ATTRIBUTE_PRESETS = {
-    # Minimal attribute set - just essential identifiers
-    "minimal": {
-        "patient": [
-            "PatientID",
-        ],
-        "study": [
-            "StudyInstanceUID",
-            "PatientID",
-            "StudyDate",
-            "StudyDescription",
-        ],
-        "series": [
-            "SeriesInstanceUID",
-            "StudyInstanceUID",
-            "Modality",
-        ],
-        "instance": [
-            "SOPInstanceUID",
-            "SeriesInstanceUID",
-        ],
+    # No attributes - use with additional_attrs to query specific tags only
+    "none": {
+        "patient": [],
+        "study": [],
+        "series": [],
+        "instance": [],
     },
-    
-    # Standard attribute set - common clinical attributes
-    "standard": {
-        "patient": [
-            "PatientID",
-            "PatientBirthDate",
-            "PatientSex",
-            "PatientAge",
-        ],
-        "study": [
-            "StudyInstanceUID",
-            "PatientID",
-            "PatientBirthDate",
-            "PatientSex",
-            "StudyDate",
-            "StudyTime",
-            "StudyDescription",
-            "ReferringPhysicianName",
-        ],
-        "series": [
-            "SeriesInstanceUID",
-            "StudyInstanceUID",
-            "Modality",
-            "SeriesDescription",
-            "BodyPartExamined",
-        ],
-        "instance": [
-            "SOPInstanceUID",
-            "SeriesInstanceUID",
-        ],
-    },
-    
-    # Extended attribute set - comprehensive information
-    "extended": {
-        "patient": [
-            "PatientID",
-            "PatientBirthDate",
-            "PatientSex",
-            "PatientAge",
-        ],
-        "study": [
-            "StudyInstanceUID",
-            "PatientID",
-            "PatientBirthDate",
-            "PatientSex",
-            "StudyDate",
-            "StudyTime",
-            "StudyDescription",
-            "AccessionNumber",
-            "ProcedureCodeSequence",
-            "ModalitiesInStudy",
-            "RequestedProcedureDescription",
-        ],
-        "series": [
-            "SeriesInstanceUID",
-            "StudyInstanceUID",
-            "Modality",
-            "SeriesDescription",
-            "BodyPartExamined",
-            "ProtocolName",
-            "PerformedProcedureStepDescription",
-            "InstitutionName",
-        ],
-        "instance": [
-            "SOPInstanceUID",
-            "SeriesInstanceUID",
-        ],
-    },
-    
+
+    # Custom attribute set - our tailored attributes
     "custom": {
         "patient": [
             "PatientID",
@@ -137,18 +56,19 @@ ATTRIBUTE_PRESETS = {
 
 def get_attributes_for_level(
     level: str, 
-    preset: str = "standard", 
+    preset: str = "none", 
     additional_attrs: Optional[List[str]] = None, 
     exclude_attrs: Optional[List[str]] = None
 ) -> List[str]:
     """Get the list of attributes for a specific query level and preset.
-    
+
     Args:
         level: Query level (patient, study, series, instance)
-        preset: Attribute preset name (minimal, standard, extended, custom)
+        preset: Attribute preset name (none, custom).
+                Defaults to "none" - caller must specify attributes via additional_attrs.
         additional_attrs: Additional attributes to include
         exclude_attrs: Attributes to exclude
-        
+
     Returns:
         List of DICOM attribute names
     """
@@ -156,11 +76,11 @@ def get_attributes_for_level(
     if preset in ATTRIBUTE_PRESETS and level in ATTRIBUTE_PRESETS[preset]:
         attr_list = ATTRIBUTE_PRESETS[preset][level].copy()
     elif preset in ATTRIBUTE_PRESETS and level not in ATTRIBUTE_PRESETS[preset]:
-        # If preset exists but doesn't have this level, fall back to standard
-        attr_list = ATTRIBUTE_PRESETS["standard"][level].copy()
+        # If preset exists but doesn't have this level, fall back to none
+        attr_list = ATTRIBUTE_PRESETS["none"][level].copy()
     else:
-        # If preset doesn't exist, fall back to standard
-        attr_list = ATTRIBUTE_PRESETS["standard"][level].copy()
+        # If preset doesn't exist, fall back to none
+        attr_list = ATTRIBUTE_PRESETS["none"][level].copy()
     
     # Add additional attributes
     if additional_attrs:

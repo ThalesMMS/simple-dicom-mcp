@@ -275,7 +275,7 @@ For development:
 * **`list_dicom_nodes`**: Show the currently active DICOM node, calling AE title, and list all configured nodes.
 * **`switch_dicom_node`**: Change the active DICOM node for subsequent operations.
 * **`verify_connection`**: Test the DICOM network connection to the currently active node using C-ECHO.
-* **`get_attribute_presets`**: List the available levels of detail (minimal, standard, extended) for metadata query results.<p>
+* **`get_attribute_presets`**: List the available attribute presets (none, custom) for metadata query results.<p>
 * **`get_manifest`**: Return the MCP tool contract manifest (required/optional tool versions).
 
 

@@ -22,12 +22,12 @@ This DICOM Model Context Protocol (MCP) server allows you to interact with medic
    list_dicom_nodes()
    ```
 
-2. Switch to a different node:
+2. Switch to a different remote node (required to c-echoing and querying other nodes):
    ```
    switch_dicom_node(node_name="research")
    ```
 
-3. Verify the connection:
+3. Verify the connection to the remote node:
    ```
    verify_connection()
    ```
@@ -68,20 +68,24 @@ Query tools return a structured response:
 
 ## Attribute Presets
 For all queries, you can specify an attribute preset:
-- `minimal`: Basic identifiers only
-- `standard`: Common clinical attributes
-- `extended`: Comprehensive information
+- `none`: No attributes, use with additional_attributes (default)
 - `custom`: Our custom attributes
 
-Example:
+Query specific tags (default behavior):
 ```
-query_studies(patient_id="12345678", attribute_preset="extended")
+query_studies(patient_id="12345678", additional_attributes=["StudyInstanceUID", "StudyDate"])
 ```
 
-You can also customize attributes:
+Use custom preset for predefined attributes:
+```
+query_studies(patient_id="12345678", attribute_preset="custom")
+```
+
+You can also customize the custom preset:
 ```
 query_studies(
     patient_id="12345678",
+    attribute_preset="custom",
     additional_attributes=["StudyComments"],
     exclude_attributes=["AccessionNumber"]
 )

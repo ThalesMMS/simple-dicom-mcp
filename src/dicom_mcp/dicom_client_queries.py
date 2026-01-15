@@ -145,7 +145,7 @@ class DicomClientQueryMixin:
         self,
         patient_id: str = None,
         birth_date: str = None,
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:
@@ -180,7 +180,7 @@ class DicomClientQueryMixin:
         accession_number: str = None,
         study_instance_uid: str = None,
         limit: Optional[int] = None,
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:
@@ -235,7 +235,7 @@ class DicomClientQueryMixin:
         series_number: str = None,
         series_description: str = None,
         limit: Optional[int] = None,
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:
@@ -277,7 +277,7 @@ class DicomClientQueryMixin:
         series_instance_uid: str,
         sop_instance_uid: str = None,
         instance_number: str = None,
-        attribute_preset: str = "custom",
+        attribute_preset: str = "none",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:
