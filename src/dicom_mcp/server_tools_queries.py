@@ -109,7 +109,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         be combined for more specific queries.
 
         Args:
-            patient_id: Patient ID to search for, e.g., "12345678"
+            patient_id: Patient ID to search for (supports wildcards), e.g., "12345678" or "*123*"
             patient_sex: Patient sex (F, M, O)
             patient_birth_date: Patient birth date or range in DICOM format:
                 - Single date: "19700101"
@@ -118,8 +118,10 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 - Single date: "20230101"
                 - Date range: "20230101-20230131"
             modality_in_study: Filter by modalities present in study, e.g., "CT" or "MR"
-            study_description: Study description text (can include wildcards), e.g., "CHEST*"
-            accession_number: Medical record accession number
+            study_description: Study description text with wildcards. IMPORTANT: Use wildcards
+                on BOTH sides for substring matching, e.g., "*CHEST*" to find "CT CHEST W CONTRAST".
+                Using "CHEST*" only matches descriptions starting with "CHEST".
+            accession_number: Medical record accession number (supports wildcards)
             study_instance_uid: Unique identifier for a specific study
             limit: Maximum number of results to return (None = no limit)
             attribute_preset: Controls which attributes to include in results:
@@ -195,7 +197,9 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
             study_instance_uid: Unique identifier for the study (required)
             modality: Filter by imaging modality, e.g., "CT", "MR", "US", "CR"
             series_number: Filter by series number
-            series_description: Series description text (can include wildcards), e.g., "AXIAL*"
+            series_description: Series description text with wildcards. IMPORTANT: Use wildcards
+                on BOTH sides for substring matching, e.g., "*AXIAL*" to find "AXIAL 2.5MM RECON".
+                Using "AXIAL*" only matches descriptions starting with "AXIAL".
             series_instance_uid: Unique identifier for a specific series
             limit: Maximum number of results to return (None = no limit)
             attribute_preset: Controls which attributes to include in results:

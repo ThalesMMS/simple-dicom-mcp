@@ -28,7 +28,7 @@ OPTIONAL_TOOL_VERSIONS: Dict[str, str] = {
 
 def _package_version() -> str:
     try:
-        return metadata.version("dicom-mcp")
+        return metadata.version("simple-dicom-mcp")
     except PackageNotFoundError:
         return "0.0.0"
 
@@ -38,7 +38,7 @@ def build_manifest(server_name: str | None = None) -> Dict[str, Any]:
         "manifest_version": MANIFEST_VERSION,
         "schema_version": SCHEMA_VERSION,
         "server": {
-            "name": server_name or "dicom-mcp",
+            "name": server_name or "simple-dicom-mcp",
             "version": _package_version(),
         },
         "tools": {

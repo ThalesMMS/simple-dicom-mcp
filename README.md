@@ -47,7 +47,7 @@ network:
 ```
 uv run --with-editable '.' -m dicom_mcp ../configs/dicom.yaml
 ```
-- If uv caches old code: add `--no-cache` or `--reinstall-package dicom-mcp`.
+- If uv caches old code: add `--no-cache` or `--reinstall-package simple-dicom-mcp`.
 
 ## Claude Desktop (working JSON)
 
@@ -62,7 +62,7 @@ uv run --with-editable '.' -m dicom_mcp ../configs/dicom.yaml
         "--",
         "bash",
         "-lc",
-        "cd '/mnt/c/Users/paulo/Python Projects/dicom-mcp' && uv run --with-editable '.' python -m dicom_mcp '/mnt/c/Users/paulo/Python Projects/configs/dicom.yaml'"
+        "cd '/mnt/c/Users/paulo/Python Projects/simple-dicom-mcp' && uv run --with-editable '.' python -m dicom_mcp '/mnt/c/Users/paulo/Python Projects/configs/dicom.yaml'"
       ]
     }
   },
@@ -108,7 +108,7 @@ query_studies(patient_id="12345678", patient_sex="O", patient_birth_date="197001
 
 ## Troubleshooting
 
-- If uv doesn’t reflect code changes, add `--no-cache` or `--reinstall-package dicom-mcp`.
+- If uv doesn’t reflect code changes, add `--no-cache` or `--reinstall-package simple-dicom-mcp`.
 - On WSL/Windows, enable mirrored networking so `localhost` works across Windows and WSL.
 
 ## License & credit
@@ -120,7 +120,7 @@ query_studies(patient_id="12345678", patient_sex="O", patient_birth_date="197001
 [![Python Version](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
  [![PyPI Version](https://img.shields.io/pypi/v/dicom-mcp.svg)](https://pypi.org/project/dicom-mcp/) [![PyPI Downloads](https://img.shields.io/pypi/dm/dicom-mcp.svg)](https://pypi.org/project/dicom-mcp/)  
 
-The `dicom-mcp` server enables AI assistants to query and read data on DICOM servers (PACS, VNA, etc.). 
+The `simple-dicom-mcp` server enables AI assistants to query and read data on DICOM servers (PACS, VNA, etc.). 
 
 <div align="center">
 
@@ -133,7 +133,7 @@ The `dicom-mcp` server enables AI assistants to query and read data on DICOM ser
 
 ## ✨ Core Capabilities
 
-`dicom-mcp` provides tools to:
+`simple-dicom-mcp` provides tools to:
 
 * **🔍 Query Metadata**: Search for patients, studies, series, and instances using various criteria.
 * **⚙️ Utilities**: Manage connections and understand query options.
@@ -143,15 +143,15 @@ The `dicom-mcp` server enables AI assistants to query and read data on DICOM ser
 Install using uv:
 
 ```bash
-uv tool install dicom-mcp
+uv tool install simple-dicom-mcp
 ```
 
 Or by cloning the repository:
 
 ```bash
 # Clone and set up development environment
-git clone https://github.com/ChristianHinge/dicom-mcp
-cd dicom-mcp
+git clone https://github.com/ThalesMMS/simple-dicom-mcp
+cd simple-dicom-mcp
 
 # Create and activate virtual environment
 uv venv
@@ -164,7 +164,7 @@ uv pip install -e ".[dev]"
 
 ### ⚙️ Configuration
 
-`dicom-mcp` requires a YAML configuration file (`config.yaml` or similar) defining DICOM nodes and calling AE titles. Adapt the configuration or keep as is for compatibility with the sample ORTHANC  Server.
+`simple-dicom-mcp` requires a YAML configuration file (`config.yaml` or similar) defining DICOM nodes and calling AE titles. Adapt the configuration or keep as is for compatibility with the sample ORTHANC  Server.
 
 ```yaml
 nodes:
@@ -202,7 +202,7 @@ Notes:
 - `calling_aet` can be a name, alias, or AE title defined in `calling_aets`.
 - `query_root` accepts `study` or `patient`.
 > [!WARNING]
-DICOM-MCP is not meant for clinical use, and should not be connected with live hospital databases or databases with patient-sensitive data. Doing so could lead to both loss of patient data, and leakage of patient data onto the internet. DICOM-MCP can be used with locally hosted open-weight LLMs for complete data privacy. 
+Simple DICOM-MCP is not meant for clinical use, and should not be connected with live hospital databases or databases with patient-sensitive data. Doing so could lead to both loss of patient data, and leakage of patient data onto the internet. Simple DICOM-MCP can be used with locally hosted open-weight LLMs for complete data privacy. 
 
 ### (Optional) Sample ORTHANC server
 If you don't have a DICOM server available, you can run a local ORTHANC server using Docker:
@@ -233,7 +233,7 @@ Add to your client configuration (e.g. `claude_desktop_config.json`):
   "mcpServers": {
     "dicom": {
       "command": "uv",
-      "args": ["tool","dicom-mcp", "/path/to/your_config.yaml"]
+      "args": ["tool","simple-dicom-mcp", "/path/to/your_config.yaml"]
     }
   }
 }
@@ -248,9 +248,9 @@ For development:
             "command": "uv",
             "args": [
                 "--directory",
-                "path/to/cloned/dicom-mcp",
+                "path/to/cloned/simple-dicom-mcp",
                 "run",
-                "dicom-mcp",
+                "simple-dicom-mcp",
                 "/path/to/your_config.yaml"
             ]
         }
@@ -261,7 +261,7 @@ For development:
 
 ## 🛠️ Tools Overview
 
-`dicom-mcp` provides five categories of tools for interaction with DICOM servers and DICOM data. 
+`simple-dicom-mcp` provides five categories of tools for interaction with DICOM servers and DICOM data. 
 
 ### 🔍 Query Metadata
 
@@ -320,7 +320,7 @@ docker compose down
 Use the MCP Inspector for debugging the server communication:
 
 ```bash
-npx @modelcontextprotocol/inspector uv run dicom-mcp /path/to/your_config.yaml --transport stdio
+npx @modelcontextprotocol/inspector uv run simple-dicom-mcp /path/to/your_config.yaml --transport stdio
 ```
 
 ### Logging
@@ -328,7 +328,7 @@ npx @modelcontextprotocol/inspector uv run dicom-mcp /path/to/your_config.yaml -
 Set `LOG_LEVEL` to control verbosity (e.g., `DEBUG`, `INFO`, `WARNING`):
 
 ```bash
-LOG_LEVEL=DEBUG uv run dicom-mcp /path/to/your_config.yaml --transport stdio
+LOG_LEVEL=DEBUG uv run simple-dicom-mcp /path/to/your_config.yaml --transport stdio
 ```
 
 ### Linting, formatting, type checking

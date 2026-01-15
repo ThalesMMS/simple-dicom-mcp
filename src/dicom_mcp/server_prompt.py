@@ -66,6 +66,23 @@ Query tools return a structured response:
 }
 ```
 
+## Wildcards
+DICOM queries support wildcards for text fields:
+- `*` matches any sequence of characters
+- `?` matches any single character
+
+IMPORTANT: For substring matching, use wildcards on BOTH sides:
+- `*CHEST*` finds "CT CHEST", "CHEST XRAY", "CT CHEST W CONTRAST"
+- `CHEST*` only finds descriptions STARTING with "CHEST"
+- `*CHEST` only finds descriptions ENDING with "CHEST"
+
+Examples:
+```
+query_studies(study_description="*ANGIO*")  # Contains "ANGIO"
+query_studies(patient_id="*123*")           # ID contains "123"
+query_series(series_description="*AXIAL*")  # Contains "AXIAL"
+```
+
 ## Attribute Presets
 For all queries, you can specify an attribute preset:
 - `none`: No attributes, use with additional_attributes (default)
