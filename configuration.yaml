@@ -1,0 +1,62 @@
+# DICOM nodes configuration
+nodes:
+  orthanc:
+    host: "localhost"
+    port: 4242
+    ae_title: "ORTHANC"
+    description: "Default Local Orthanc DICOM server"
+    aliases: ["local", "dev-orthanc"]
+ 
+  radiant:
+    host: "localhost"
+    port: 11112
+    ae_title: "RADIANT"
+    description: "Radiant Viewer Dicom Node"
+    aliases: ["viewer"]
+ 
+  monai-deploy:
+    host: "localhost"
+    port: 104
+    ae_title: "MONAI-DEPLOY"
+    description: "Monai Deploy Dicom Node"
+    aliases: []
+ 
+# Currently selected node
+current_node: "orthanc"
+ 
+# Local calling AE titles
+calling_aets:
+  default:
+    ae_title: "MCPSCU"
+    description: "Default calling AE"
+ 
+# Currently selected calling AE title
+calling_aet: "default"
+ 
+# Query/Retrieve root selection ("study" or "patient")
+query_retrieve_root: "study"
+ 
+# Network timeouts and PDU size
+network:
+  acse_timeout: 10
+  dimse_timeout: 30
+  network_timeout: 30
+  assoc_timeout: 10
+  max_pdu: 16384
+  storage_contexts: "all"
+  retry:
+    max_attempts: 2
+    backoff_seconds: 1.0
+    backoff_multiplier: 2.0
+    backoff_max_seconds: 5.0
+ 
+# Storage configuration
+# Replaces legacy 'download_directory'
+storage:
+  path: "./downloads"
+  retention_days: 30       # Automatically delete files older than 30 days (0 to disable)
+  dir_permissions: "0o700"  # Directory permissions (octal): owner read/write/execute
+  file_permissions: "0o600" # File permissions (octal): owner read/write only
+ 
+# Legacy setting (optional, storage.path is preferred)
+# download_directory: "./downloads"
