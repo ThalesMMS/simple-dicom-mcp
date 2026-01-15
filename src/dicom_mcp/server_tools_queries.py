@@ -15,10 +15,9 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
 
     @mcp.tool()
     def query_patients(
-        name_pattern: str = "",
         patient_id: str = "",
         birth_date: str = "",
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -30,13 +29,13 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         be combined for more specific queries.
 
         Args:
-            name_pattern: Patient name pattern (can include wildcards * and ?), e.g., "SMITH*"
             patient_id: Patient ID to search for, e.g., "12345678"
             birth_date: Patient birth date in YYYYMMDD format, e.g., "19700101"
             attribute_preset: Controls which attributes to include in results:
                 - "minimal": Only essential attributes
                 - "standard": Common attributes (default)
                 - "extended": All available attributes
+                - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
 
@@ -54,7 +53,6 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 "results": [
                     {
                         "PatientID": "12345",
-                        "PatientName": "SMITH^JOHN",
                         "PatientBirthDate": "19700101",
                         "PatientSex": "M"
                     }
@@ -73,7 +71,6 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         try:
             return client.query_patient(
                 patient_id=patient_id,
-                name_pattern=name_pattern,
                 birth_date=birth_date,
                 attribute_preset=attribute_preset,
                 additional_attrs=additional_attributes,
@@ -94,7 +91,6 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
     @mcp.tool()
     def query_studies(
         patient_id: str = "",
-        patient_name: str = "",
         patient_sex: str = "",
         patient_birth_date: str = "",
         study_date: str = "",
@@ -103,7 +99,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         accession_number: str = "",
         study_instance_uid: str = "",
         limit: int | None = None,
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -116,7 +112,6 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
 
         Args:
             patient_id: Patient ID to search for, e.g., "12345678"
-            patient_name: Patient name to search for (can include wildcards)
             patient_sex: Patient sex (F, M, O)
             patient_birth_date: Patient birth date or range in DICOM format:
                 - Single date: "19700101"
@@ -133,6 +128,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 - "minimal": Only essential attributes
                 - "standard": Common attributes (default)
                 - "extended": All available attributes
+                - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
 
@@ -144,7 +140,6 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 "StudyDate": "20230215",
                 "StudyDescription": "CHEST CT",
                 "PatientID": "12345",
-                "PatientName": "SMITH^JOHN",
                 "ModalitiesInStudy": "CT"
             }
 
@@ -157,7 +152,6 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         try:
             return client.query_study(
                 patient_id=patient_id,
-                patient_name=patient_name,
                 patient_sex=patient_sex,
                 patient_birth_date=patient_birth_date,
                 study_date=study_date,
@@ -190,7 +184,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         series_description: str = "",
         series_instance_uid: str = "",
         limit: int | None = None,
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -212,6 +206,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 - "minimal": Only essential attributes
                 - "standard": Common attributes (default)
                 - "extended": All available attributes
+                - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
 
@@ -261,7 +256,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
         series_instance_uid: str,
         instance_number: str = "",
         sop_instance_uid: str = "",
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attributes: List[str] = None,
         exclude_attributes: List[str] = None,
         ctx: Context = None,
@@ -280,6 +275,7 @@ def register_query_tools(mcp: FastMCP, deps: ToolDependencies) -> None:
                 - "minimal": Only essential attributes
                 - "standard": Common attributes (default)
                 - "extended": All available attributes
+                - "custom": Our custom attributes
             additional_attributes: List of specific DICOM attributes to include beyond the preset
             exclude_attributes: List of DICOM attributes to exclude from the results
 

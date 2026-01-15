@@ -70,7 +70,6 @@ class DicomConfiguration(BaseModel):
     )
     network: NetworkConfig = NetworkConfig()
 
-    @property
     def _find_calling_aet(self, name: str) -> Optional[Tuple[str, CallingAETConfig]]:
         if not name:
             return None

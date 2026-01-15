@@ -11,8 +11,8 @@ from typing import Any, Callable, List, Optional
 
 from pynetdicom import AE
 from pynetdicom.sop_class import (
-    PatientRootQueryInformationModelFind,
-    StudyRootQueryInformationModelFind,
+    PatientRootQueryRetrieveInformationModelFind,
+    StudyRootQueryRetrieveInformationModelFind,
     Verification,
 )
 
@@ -84,14 +84,14 @@ class DicomClientBase:
 
     def _configure_query_contexts(self) -> None:
         if self.query_root == "patient":
-            self._find_model = PatientRootQueryInformationModelFind
+            self._find_model = PatientRootQueryRetrieveInformationModelFind
         else:
-            self._find_model = StudyRootQueryInformationModelFind
+            self._find_model = StudyRootQueryRetrieveInformationModelFind
 
         self.ae.add_requested_context(self._find_model)
         if self.query_root != "patient":
             # Patient-level C-FIND requires Patient Root even when Study Root is selected.
-            self.ae.add_requested_context(PatientRootQueryInformationModelFind)
+            self.ae.add_requested_context(PatientRootQueryRetrieveInformationModelFind)
 
 
     def _apply_network_config(self, network: NetworkConfig) -> None:

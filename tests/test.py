@@ -47,7 +47,7 @@ def main():
     print(f"Found {len(patients)} patients")
     patient_id = patients[0]["PatientID"]
     print(f"Using patient ID: {patient_id}")
-    
+
     # Query for studies
     print("\nQuerying studies...")
     studies_result = client.query_study(patient_id=patient_id)

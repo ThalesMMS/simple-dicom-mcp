@@ -9,9 +9,11 @@ ATTRIBUTE_PRESETS = {
     # Minimal attribute set - just essential identifiers
     "minimal": {
         "patient": [
+            "PatientID",
         ],
         "study": [
             "StudyInstanceUID",
+            "PatientID",
             "StudyDate",
             "StudyDescription",
         ],
@@ -19,136 +21,92 @@ ATTRIBUTE_PRESETS = {
             "SeriesInstanceUID",
             "StudyInstanceUID",
             "Modality",
-            "SeriesNumber",
         ],
         "instance": [
             "SOPInstanceUID",
             "SeriesInstanceUID",
-            "InstanceNumber",
         ],
     },
     
     # Standard attribute set - common clinical attributes
     "standard": {
         "patient": [
+            "PatientID",
             "PatientBirthDate",
             "PatientSex",
             "PatientAge",
         ],
         "study": [
             "StudyInstanceUID",
+            "PatientID",
             "PatientBirthDate",
             "PatientSex",
             "StudyDate",
             "StudyTime",
             "StudyDescription",
-            "AccessionNumber",
             "ReferringPhysicianName",
-            "StudyID",
-            "NumberOfStudyRelatedSeries",
-            "NumberOfStudyRelatedInstances",
         ],
         "series": [
             "SeriesInstanceUID",
             "StudyInstanceUID",
             "Modality",
-            "SeriesNumber",
             "SeriesDescription",
             "BodyPartExamined",
-            "PatientPosition",
-            "NumberOfSeriesRelatedInstances",
         ],
         "instance": [
             "SOPInstanceUID",
             "SeriesInstanceUID",
-            "SOPClassUID",
-            "InstanceNumber",
-            "ContentDate",
-            "ContentTime",
-            "ImageType",
-            "NumberOfFrames",
         ],
     },
     
     # Extended attribute set - comprehensive information
     "extended": {
         "patient": [
+            "PatientID",
             "PatientBirthDate",
             "PatientSex",
             "PatientAge",
-            "PatientWeight",
-            "PatientAddress",
-            "PatientComments",
-            "IssuerOfPatientID",
-            "EthnicGroup",
         ],
         "study": [
             "StudyInstanceUID",
+            "PatientID",
             "PatientBirthDate",
             "PatientSex",
             "StudyDate",
             "StudyTime",
             "StudyDescription",
             "AccessionNumber",
-            "ReferringPhysicianName",
-            "StudyID",
             "ProcedureCodeSequence",
-            "NumberOfStudyRelatedSeries",
-            "NumberOfStudyRelatedInstances",
-            "StudyComments",
-            "AdmissionID",
             "ModalitiesInStudy",
-            "RequestingPhysician",
             "RequestedProcedureDescription",
         ],
         "series": [
             "SeriesInstanceUID",
             "StudyInstanceUID",
             "Modality",
-            "SeriesNumber",
             "SeriesDescription",
             "BodyPartExamined",
-            "PatientPosition",
-            "NumberOfSeriesRelatedInstances",
-            "SeriesDate",
-            "SeriesTime",
-            "PerformingPhysicianName",
             "ProtocolName",
-            "OperatorsName",
             "PerformedProcedureStepDescription",
-            "AnatomicalOrientationType",
             "InstitutionName",
         ],
         "instance": [
             "SOPInstanceUID",
             "SeriesInstanceUID",
-            "SOPClassUID",
-            "InstanceNumber",
-            "ContentDate",
-            "ContentTime",
-            "ImageType",
-            "AcquisitionDate",
-            "AcquisitionTime",
-            "ImageComments",
-            "NumberOfFrames",
-            "BurnedInAnnotation",
-            "WindowCenter",
-            "WindowWidth",
-            "ImagePositionPatient",
-            "ImageOrientationPatient",
-            "SliceLocation",
-            "PixelSpacing",
-            "PhotometricInterpretation",
-            "BitsAllocated",
-            "BitsStored",
         ],
     },
     
     "custom": {
-        "patient": [],
+        "patient": [
+            "PatientID",
+            "PatientBirthDate",
+            "PatientSex",
+            "PatientAge",
+        ],
         
         "study": [
             "StudyInstanceUID",
+            "PatientID",
             "AccessionNumber",
             "StudyDescription",
             "PatientBirthDate",
@@ -161,6 +119,7 @@ ATTRIBUTE_PRESETS = {
         
         "series": [
             "SeriesInstanceUID",
+            "StudyInstanceUID",
             "Modality",
             "SeriesDescription",
             "BodyPartExamined",
@@ -168,7 +127,10 @@ ATTRIBUTE_PRESETS = {
             "RequestAttributesSequence",
         ],
         
-        "instance": [],
+        "instance": [
+            "SOPInstanceUID",
+            "SeriesInstanceUID",
+            ],
     },
 }
 
@@ -183,7 +145,7 @@ def get_attributes_for_level(
     
     Args:
         level: Query level (patient, study, series, instance)
-        preset: Attribute preset name (minimal, standard, extended)
+        preset: Attribute preset name (minimal, standard, extended, custom)
         additional_attrs: Additional attributes to include
         exclude_attrs: Attributes to exclude
         

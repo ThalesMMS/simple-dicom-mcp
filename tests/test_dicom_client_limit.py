@@ -9,6 +9,13 @@ from dicom_mcp.config import NetworkConfig, RetryConfig
 from dicom_mcp.dicom_client import DicomClient
 
 
+def _make_dataset(patient_id: str) -> Dataset:
+    """Create a simple Dataset for testing."""
+    ds = Dataset()
+    ds.PatientID = patient_id
+    return ds
+
+
 class FakeStatus:
     def __init__(self, status: int) -> None:
         self.Status = status
@@ -61,12 +68,6 @@ class FlakyAE:
         return self._assoc
 
 
-def _make_dataset(patient_id: str) -> Dataset:
-    ds = Dataset()
-    ds.PatientID = patient_id
-    return ds
-
-
 def test_find_respects_limit() -> None:
     responses = [
         (FakeStatus(0xFF00), _make_dataset("1")),
@@ -84,7 +85,6 @@ def test_find_respects_limit() -> None:
     assert len(result["results"]) == 2
     assert result["results"][0]["PatientID"] == "1"
     assert result["results"][1]["PatientID"] == "2"
-
 
 def test_find_without_limit_returns_all() -> None:
     responses = [

@@ -103,7 +103,7 @@ query_studies(study_date="20230101-20231231")
 
 - Filter studies by patient attributes:
 ```
-query_studies(patient_name="*TEST*", patient_sex="O", patient_birth_date="19700101")
+query_studies(patient_id="12345678", patient_sex="O", patient_birth_date="19700101")
 ```
 
 ## Troubleshooting
@@ -265,7 +265,7 @@ For development:
 
 ### 🔍 Query Metadata
 
-* **`query_patients`**: Search for patients based on criteria like name, ID, or birth date.
+* **`query_patients`**: Search for patients based on criteria like ID or birth date.
 * **`query_studies`**: Find studies using patient ID, date, modality, description, accession number, or Study UID.
 * **`query_series`**: Locate series within a specific study using modality, series number/description, or Series UID.
 * **`query_instances`**: Find individual instances (images/objects) within a series using instance number or SOP Instance UID

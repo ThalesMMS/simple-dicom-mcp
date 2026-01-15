@@ -10,7 +10,7 @@ from pydicom.dataset import Dataset
 from pydicom.datadict import dictionary_VR, tag_for_keyword
 from pydicom.multival import MultiValue
 from pydicom.sequence import Sequence
-from pynetdicom.sop_class import PatientRootQueryInformationModelFind
+from pynetdicom.sop_class import PatientRootQueryRetrieveInformationModelFind
 
 from .attributes import get_attributes_for_level
 from .errors import DicomAssociationError
@@ -144,9 +144,8 @@ class DicomClientQueryMixin:
     def query_patient(
         self,
         patient_id: str = None,
-        name_pattern: str = None,
         birth_date: str = None,
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:
@@ -157,11 +156,7 @@ class DicomClientQueryMixin:
         ds.QueryRetrieveLevel = "PATIENT"
 
         # Add query parameters if provided
-        if patient_id:
-            ds.PatientID = patient_id
-
-        if name_pattern:
-            ds.PatientName = name_pattern
+        ds.PatientID = patient_id if patient_id is not None else ""
 
         if birth_date:
             ds.PatientBirthDate = birth_date
@@ -172,12 +167,11 @@ class DicomClientQueryMixin:
             self._set_query_attribute(ds, attr)
 
         # Execute query
-        return self.find(ds, PatientRootQueryInformationModelFind)
+        return self.find(ds, PatientRootQueryRetrieveInformationModelFind)
 
     def query_study(
         self,
         patient_id: str = None,
-        patient_name: str = None,
         patient_sex: str = None,
         patient_birth_date: str = None,
         study_date: str = None,
@@ -186,7 +180,7 @@ class DicomClientQueryMixin:
         accession_number: str = None,
         study_instance_uid: str = None,
         limit: Optional[int] = None,
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:
@@ -203,9 +197,6 @@ class DicomClientQueryMixin:
         # Add query parameters if provided
         if patient_id:
             ds.PatientID = patient_id
-
-        if patient_name:
-            ds.PatientName = patient_name
 
         if patient_sex:
             ds.PatientSex = patient_sex
@@ -244,7 +235,7 @@ class DicomClientQueryMixin:
         series_number: str = None,
         series_description: str = None,
         limit: Optional[int] = None,
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:
@@ -286,7 +277,7 @@ class DicomClientQueryMixin:
         series_instance_uid: str,
         sop_instance_uid: str = None,
         instance_number: str = None,
-        attribute_preset: str = "standard",
+        attribute_preset: str = "custom",
         additional_attrs: List[str] = None,
         exclude_attrs: List[str] = None,
     ) -> Dict[str, Any]:

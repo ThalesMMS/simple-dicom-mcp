@@ -97,7 +97,6 @@ def upload_test_data():
     ds.file_meta = file_meta
     
     # Patient data
-    ds.PatientName = "TEST^PATIENT"
     ds.PatientID = "TEST123"
     ds.PatientBirthDate = "19700101"
     ds.PatientSex = "O"
@@ -220,21 +219,17 @@ def test_verify_connection(dicom_client):
 
 def test_query_patients(dicom_client):
     """Test query_patients using the DICOM client directly"""
-    result = dicom_client.query_patient()
-    
+    result = dicom_client.query_patient(patient_id="TEST123")
+
     assert result is not None
     assert isinstance(result, dict)
     assert result["success"] is True
     patients = result["results"]
     assert len(patients) > 0, "No patients found"
-    
-    # Verify the test patient
-    patient_found = False
-    for patient in patients:
-        if patient.get("PatientID") == "TEST123":
-            patient_found = True
-            break
-    
+    patient_found = any(
+        patient.get("PatientID") == "TEST123"
+        for patient in patients
+    )
     assert patient_found, "Test patient not found"
 
 
@@ -247,7 +242,6 @@ def test_query_studies(dicom_client):
 def test_query_studies_patient_filters(dicom_client):
     """Test query_studies with patient-level filters"""
     result = dicom_client.query_study(
-        patient_name="*TEST*",
         patient_sex="O",
         patient_birth_date="19700101",
     )
@@ -335,6 +329,7 @@ def test_get_attribute_presets():
     assert "minimal" in ATTRIBUTE_PRESETS
     assert "standard" in ATTRIBUTE_PRESETS
     assert "extended" in ATTRIBUTE_PRESETS
+    assert "custom" in ATTRIBUTE_PRESETS
 
 
 def test_create_server():

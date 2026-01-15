@@ -37,7 +37,7 @@ For flexible search operations:
 
 1. Search for patients:
    ```
-   query_patients(name_pattern="SMITH*")
+   query_patients(patient_id="12345678")
    ```
 
 2. Search for studies:
@@ -71,6 +71,7 @@ For all queries, you can specify an attribute preset:
 - `minimal`: Basic identifiers only
 - `standard`: Common clinical attributes
 - `extended`: Comprehensive information
+- `custom`: Our custom attributes
 
 Example:
 ```

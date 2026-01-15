@@ -214,7 +214,7 @@ def register_core_tools(mcp: FastMCP, deps: ToolDependencies, server_name: str) 
 
         This tool returns the defined attribute presets that can be used with the
         query_* functions. It shows which DICOM attributes are included in each
-        preset (minimal, standard, extended) for each query level.
+        preset (minimal, standard, extended, custom) for each query level.
 
         Returns:
             Dictionary organized by query level (patient, study, series, instance),
@@ -224,14 +224,16 @@ def register_core_tools(mcp: FastMCP, deps: ToolDependencies, server_name: str) 
         Example:
             {
                 "patient": {
-                    "minimal": ["PatientID", "PatientName"],
-                    "standard": ["PatientID", "PatientName", "PatientBirthDate", "PatientSex"],
-                    "extended": ["PatientID", "PatientName", "PatientBirthDate", "PatientSex", ...]
+                    "minimal": ["PatientID"],
+                    "standard": ["PatientID", "PatientBirthDate", "PatientSex"],
+                    "extended": ["PatientID", "PatientBirthDate", "PatientSex", ...],
+                    "custom": ["PatientID"]
                 },
                 "study": {
                     "minimal": ["StudyInstanceUID", "StudyDate"],
                     "standard": ["StudyInstanceUID", "StudyDate", "StudyDescription", ...],
                     "extended": ["StudyInstanceUID", "StudyDate", "StudyDescription", ...]
+                    "custom": ["StudyInstanceUID", "StudyDate", "StudyDescription", ...]
                 },
                 ...
             }
