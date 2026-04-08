@@ -124,9 +124,10 @@ The `simple-dicom-mcp` server enables AI assistants to query and read data on DI
 
 <div align="center">
 
-🤝 **[Contribute](#contributing)** •
-📝 **[Report Bug](https://github.com/ChristianHinge/dicom-mcp/issues)**  •
-📝 **[Blog Post 1](https://www.christianhinge.com/projects/dicom-mcp/)** 
+🤝 **[Contributing guide](./CONTRIBUTING.md)** •
+🐞 **[Report bug](https://github.com/ThalesMMS/simple-dicom-mcp/issues/new/choose)** •
+🛟 **[Support](./SUPPORT.md)** •
+🔐 **[Security](./SECURITY.md)**
 
 </div>
 
@@ -282,6 +283,14 @@ For development:
 ### Example interaction
 The tools can be chained together to answer complex questions:
 
+
+## 🤝 Community health
+
+- Read `CONTRIBUTING.md` before opening a pull request.
+- Use the issue forms for bugs and focused feature ideas.
+- Follow `SECURITY.md` for vulnerability reporting.
+- Use `SUPPORT.md` for setup/help guidance.
+- Do not post PHI, real DICOM studies, or live PACS credentials in issues or PRs.
 
 ## 📈 Contributing
 ### Running Tests

@@ -1,0 +1,52 @@
+name: Bug report
+description: Report a reproducible problem in simple-dicom-mcp
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug.
+
+        **Do not include PHI, patient identifiers, real DICOM files, screenshots from clinical systems, or secrets.** Use synthetic or scrubbed examples only.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: Short description of the problem
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Include exact commands, config fragments with secrets removed, and what you expected to happen.
+      placeholder: |
+        1. Install ...
+        2. Run ...
+        3. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        OS:
+        Python:
+        Install method:
+        DICOM server used for repro:
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or output
+      description: Paste only sanitized output.
+      render: shell
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional context
+      description: Mention whether the problem reproduces with the sample Orthanc setup or synthetic data.
