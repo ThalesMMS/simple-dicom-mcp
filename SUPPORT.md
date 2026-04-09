@@ -28,15 +28,15 @@ Use synthetic or fully scrubbed examples only.
 
 ### Can I point this at a live hospital PACS?
 
-Not as a recommended default. This repository is a simplified MCP server intended for controlled, non-clinical, privacy-conscious setups.
+No. This repository is not intended for use against a live hospital PACS; it is a simplified MCP server for controlled, non-clinical, privacy-conscious setups.
 
 ### Does this project support write operations such as store/move?
 
 No. The project scope is intentionally simpler and read-only.
 
-### Where should feature ideas go?
+### Where should feature ideas go? Please use the Feature Request template (GitHub issue form).
 
-Open an issue with the problem you want solved and the workflow behind it. Small, focused proposals are easier to review than broad roadmaps.
+Please open a new issue with the [Feature Request template (GitHub issue form)](https://github.com/ThalesMMS/simple-dicom-mcp/issues/new?template=feature_request.yml) and include the problem, the workflow behind it, and a focused proposal. Small, focused proposals are easier to review than broad roadmaps.
 
 ### Where can I find a local test setup?
 
