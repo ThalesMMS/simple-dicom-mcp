@@ -7,6 +7,7 @@ import os
 import sys
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any, AsyncIterator, Dict, List
 
 from mcp.server.fastmcp import FastMCP
@@ -30,7 +31,10 @@ class DicomContext:
     config: DicomConfiguration
 
 
-def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMCP:
+ConfigSource = DicomConfiguration | str | Path
+
+
+def create_dicom_mcp_server(config: ConfigSource, name: str = "DICOM MCP") -> FastMCP:
     """Create and configure a DICOM MCP server."""
 
     level_name = os.getenv("LOG_LEVEL")
@@ -39,6 +43,11 @@ def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMC
         if isinstance(level, int):
             logger.setLevel(level)
             logging.getLogger("dicom_mcp.dicom_client").setLevel(level)
+
+    if isinstance(config, DicomConfiguration):
+        resolved_config = config
+    else:
+        resolved_config = load_config(str(config))
 
     def _create_client_from_config(config: DicomConfiguration) -> DicomClient:
         """Create a new DICOM client for the current configuration."""
@@ -74,7 +83,14 @@ def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMC
             if value not in (None, "", [], {}):
                 base[key] = value
 
-        ordered_keys = ("operation", "node", "called_aet", "calling_aet", "host", "port")
+        ordered_keys = (
+            "operation",
+            "node",
+            "called_aet",
+            "calling_aet",
+            "host",
+            "port",
+        )
         parts: List[str] = []
         for key in ordered_keys:
             value = base.get(key)
@@ -108,20 +124,21 @@ def create_dicom_mcp_server(config_path: str, name: str = "DICOM MCP") -> FastMC
         payload.setdefault("message", error.get("message", "Operation failed"))
         payload["error"] = error
         if sys.exc_info()[0] is not None:
-            logger.exception(_format_log_event(operation, config, error=error.get("message")))
+            logger.exception(
+                _format_log_event(operation, config, error=error.get("message"))
+            )
         else:
-            logger.error(_format_log_event(operation, config, error=error.get("message")))
+            logger.error(
+                _format_log_event(operation, config, error=error.get("message"))
+            )
         return payload
 
     # Define a simple lifespan function
     @asynccontextmanager
     async def lifespan(server: FastMCP) -> AsyncIterator[DicomContext]:
-        # Load config
-        config = load_config(config_path)
+        logger.info(_format_log_event("config_loaded", resolved_config))
 
-        logger.info(_format_log_event("config_loaded", config))
-
-        yield DicomContext(config=config)
+        yield DicomContext(config=resolved_config)
 
     # Create server
     mcp = FastMCP(name, lifespan=lifespan)

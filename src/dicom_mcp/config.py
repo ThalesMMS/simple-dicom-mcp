@@ -2,10 +2,11 @@
 DICOM configuration using Pydantic.
 """
 
-import yaml
 from pathlib import Path
 from typing import Dict, Optional, Tuple
-from pydantic import BaseModel, Field, field_validator, model_validator
+
+import yaml
+from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
 
 from .errors import DicomConfigurationError
 
@@ -70,6 +71,19 @@ class DicomConfiguration(BaseModel):
     )
     network: NetworkConfig = NetworkConfig()
 
+    def _available_nodes_text(self) -> str:
+        return ", ".join(sorted(self.nodes))
+
+    def _available_calling_aets_text(self) -> str:
+        entries: list[str] = []
+        for name, calling_aet in sorted(self.calling_aets.items()):
+            entry = f"{name} (ae_title={calling_aet.ae_title}"
+            if calling_aet.aliases:
+                entry += f", aliases={', '.join(sorted(calling_aet.aliases))}"
+            entry += ")"
+            entries.append(entry)
+        return "; ".join(entries)
+
     def _find_calling_aet(self, name: str) -> Optional[Tuple[str, CallingAETConfig]]:
         if not name:
             return None
@@ -119,13 +133,28 @@ class DicomConfiguration(BaseModel):
             raise ValueError("At least one DICOM node must be configured")
         if self.current_node not in self.nodes:
             raise ValueError(
-                f"current_node '{self.current_node}' not found in configuration"
+                f"current_node '{self.current_node}' not found in configuration. "
+                f"Available nodes: {self._available_nodes_text()}"
             )
         if self.calling_aets and self._find_calling_aet(self.calling_aet) is None:
             raise ValueError(
-                "calling_aet must match a calling_aets name, alias, or ae_title"
+                f"calling_aet '{self.calling_aet}' not found in configuration. "
+                "Use a calling_aets name, alias, or ae_title. "
+                f"Available calling_aets: {self._available_calling_aets_text()}"
             )
         return self
+
+
+def _format_validation_error(exc: ValidationError) -> str:
+    messages: list[str] = []
+    for error in exc.errors(include_url=False):
+        location = ".".join(str(part) for part in error.get("loc", ()))
+        message = error.get("msg", "Invalid value")
+        if location and not location.startswith("__root__"):
+            messages.append(f"{location}: {message}")
+        else:
+            messages.append(message)
+    return "; ".join(messages) or str(exc)
 
 
 def load_config(config_path: str) -> DicomConfiguration:
@@ -144,10 +173,27 @@ def load_config(config_path: str) -> DicomConfiguration:
     if not path.exists():
         raise DicomConfigurationError(f"Configuration file {path} not found")
     
-    with open(path, 'r') as f:
-        data = yaml.safe_load(f)
+    try:
+        with open(path, 'r') as f:
+            data = yaml.safe_load(f)
+    except (OSError, yaml.YAMLError) as exc:
+        raise DicomConfigurationError(
+            f"Invalid configuration in {path}: {str(exc)}"
+        ) from exc
+
+    if not isinstance(data, dict):
+        raise DicomConfigurationError(
+            f"Invalid configuration in {path}: YAML must contain a mapping/object"
+        )
     
     try:
         return DicomConfiguration(**data)
+    except ValidationError as exc:
+        message = _format_validation_error(exc)
+        raise DicomConfigurationError(
+            f"Invalid configuration in {path}: {message}"
+        ) from exc
     except Exception as e:
-        raise DicomConfigurationError(f"Invalid configuration in {path}: {str(e)}") from e
+        raise DicomConfigurationError(
+            f"Invalid configuration in {path}: {str(e)}"
+        ) from e

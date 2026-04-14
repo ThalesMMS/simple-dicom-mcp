@@ -2,7 +2,7 @@ Repo credit: https://github.com/ChristianHinge/dicom-mcp
 
 ## Run it
 
-- Minimal config (configs/dicom.yaml):
+- Minimal config (`configuration.yaml`):
 ```
 nodes:
   orthanc:
@@ -45,7 +45,7 @@ network:
 
 - Start server (dev):
 ```
-uv run --with-editable '.' -m dicom_mcp ../configs/dicom.yaml
+uv run --with-editable '.' -m dicom_mcp configuration.yaml
 ```
 - If uv caches old code: add `--no-cache` or `--reinstall-package simple-dicom-mcp`.
 
@@ -62,7 +62,7 @@ uv run --with-editable '.' -m dicom_mcp ../configs/dicom.yaml
         "--",
         "bash",
         "-lc",
-        "cd '/mnt/c/Users/paulo/Python Projects/simple-dicom-mcp' && uv run --with-editable '.' python -m dicom_mcp '/mnt/c/Users/paulo/Python Projects/configs/dicom.yaml'"
+        "cd '/mnt/c/Users/paulo/Python Projects/simple-dicom-mcp' && uv run --with-editable '.' python -m dicom_mcp '/mnt/c/Users/paulo/Python Projects/simple-dicom-mcp/configuration.yaml'"
       ]
     }
   },
@@ -245,7 +245,7 @@ For development:
 ```json
 {
     "mcpServers": {
-        "arxiv-mcp-server": {
+        "simple-dicom-mcp": {
             "command": "uv",
             "args": [
                 "--directory",
