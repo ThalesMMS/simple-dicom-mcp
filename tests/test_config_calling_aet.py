@@ -126,6 +126,50 @@ def test_current_node_validation_lists_available_nodes() -> None:
         _base_config(current_node="missing")
 
 
+def test_default_config_rejects_remote_hosts() -> None:
+    with pytest.raises(
+        ValidationError,
+        match=r"Non-loopback DICOM hosts require allow_remote_hosts: true. Remote nodes: node1",
+    ):
+        _base_config(
+            nodes={
+                "node1": {
+                    "host": "198.51.100.10",
+                    "port": 11112,
+                    "ae_title": "NODE",
+                }
+            }
+        )
+
+
+def test_default_config_allows_loopback_variants() -> None:
+    for host in ("localhost", "127.0.0.1", "127.0.0.42", "::1", "[::1]"):
+        config = _base_config(
+            nodes={
+                "node1": {
+                    "host": host,
+                    "port": 11112,
+                    "ae_title": "NODE",
+                }
+            }
+        )
+        assert config.nodes["node1"].host == host
+
+
+def test_remote_hosts_can_be_enabled_explicitly() -> None:
+    config = _base_config(
+        allow_remote_hosts=True,
+        nodes={
+            "node1": {
+                "host": "pacs.example.internal",
+                "port": 11112,
+                "ae_title": "NODE",
+            }
+        },
+    )
+    assert config.allow_remote_hosts is True
+
+
 def test_load_config_formats_validation_errors_for_humans(tmp_path: Path) -> None:
     config_path = tmp_path / "bad.yaml"
     config_path.write_text(
@@ -169,6 +213,31 @@ def test_load_config_wraps_yaml_parse_errors(tmp_path: Path) -> None:
     with pytest.raises(
         DicomConfigurationError,
         match=r"Invalid configuration in .*bad.yaml",
+    ):
+        load_config(str(config_path))
+
+
+def test_load_config_rejects_remote_hosts_without_opt_in(tmp_path: Path) -> None:
+    config_path = tmp_path / "bad.yaml"
+    config_path.write_text(
+        yaml.safe_dump(
+            {
+                "nodes": {
+                    "remote": {
+                        "host": "198.51.100.10",
+                        "port": 104,
+                        "ae_title": "REMOTE",
+                    }
+                },
+                "current_node": "remote",
+                "calling_aet": "MCPSCU",
+            }
+        )
+    )
+
+    with pytest.raises(
+        DicomConfigurationError,
+        match=r"allow_remote_hosts: true.*Remote nodes: remote",
     ):
         load_config(str(config_path))
 

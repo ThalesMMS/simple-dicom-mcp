@@ -28,6 +28,7 @@ calling_aets:
 
 calling_aet: "default"
 query_root: "study"
+allow_remote_hosts: false
 
 network:
   acse_timeout: 10
@@ -185,6 +186,7 @@ calling_aets:
 
 calling_aet: "default"
 query_root: "study"
+allow_remote_hosts: false
 
 network:
   acse_timeout: 10
@@ -202,8 +204,9 @@ network:
 Notes:
 - `calling_aet` can be a name, alias, or AE title defined in `calling_aets`.
 - `query_root` accepts `study` or `patient`.
+- `allow_remote_hosts` defaults to `false` and blocks non-loopback DICOM hosts unless you explicitly opt in.
 > [!WARNING]
-Simple DICOM-MCP is not meant for clinical use, and should not be connected with live hospital databases or databases with patient-sensitive data. Doing so could lead to both loss of patient data, and leakage of patient data onto the internet. Simple DICOM-MCP can be used with locally hosted open-weight LLMs for complete data privacy. 
+Simple DICOM-MCP is not meant for clinical use, and should not be connected with live hospital databases or databases with patient-sensitive data. Doing so could lead to both loss of patient data, and leakage of patient data onto the internet. If you intentionally need a remote PACS or VNA, set `allow_remote_hosts: true` only after reviewing the risk and using a private, trusted environment.
 
 ### (Optional) Sample ORTHANC server
 If you don't have a DICOM server available, you can run a local ORTHANC server using Docker:

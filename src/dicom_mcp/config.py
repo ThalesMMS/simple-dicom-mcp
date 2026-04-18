@@ -2,6 +2,7 @@
 DICOM configuration using Pydantic.
 """
 
+import ipaddress
 from pathlib import Path
 from typing import Dict, Optional, Tuple
 
@@ -59,6 +60,17 @@ class NetworkConfig(BaseModel):
     retry: RetryConfig = RetryConfig()
 
 
+def _is_loopback_host(host: str) -> bool:
+    normalized = str(host).strip().lower()
+    if normalized == "localhost":
+        return True
+
+    try:
+        return ipaddress.ip_address(normalized.strip("[]")).is_loopback
+    except ValueError:
+        return False
+
+
 class DicomConfiguration(BaseModel):
     """Complete DICOM configuration"""
     nodes: Dict[str, DicomNodeConfig]
@@ -68,6 +80,12 @@ class DicomConfiguration(BaseModel):
     query_root: str = Field(
         default="study",
         description="Query root to use (study or patient).",
+    )
+    allow_remote_hosts: bool = Field(
+        default=False,
+        description=(
+            "Require explicit opt-in before connecting to non-loopback DICOM hosts."
+        ),
     )
     network: NetworkConfig = NetworkConfig()
 
@@ -142,6 +160,15 @@ class DicomConfiguration(BaseModel):
                 "Use a calling_aets name, alias, or ae_title. "
                 f"Available calling_aets: {self._available_calling_aets_text()}"
             )
+        if not self.allow_remote_hosts:
+            remote_nodes = [
+                name for name, node in sorted(self.nodes.items()) if not _is_loopback_host(node.host)
+            ]
+            if remote_nodes:
+                raise ValueError(
+                    "Non-loopback DICOM hosts require allow_remote_hosts: true. "
+                    f"Remote nodes: {', '.join(remote_nodes)}"
+                )
         return self
 
 
