@@ -1,0 +1,31 @@
+name: Feature request
+description: Suggest a focused improvement for simple-dicom-mcp
+title: "idea: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      placeholder: Describe the user workflow or pain point first.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed approach
+      placeholder: Keep it focused and proportionate to the repo's read-only MCP scope.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I checked that this idea fits the repository's read-only / non-clinical scope.
+          required: true
+        - label: I am not posting PHI, credentials, or real patient data.
+          required: true

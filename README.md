@@ -2,7 +2,7 @@ Repo credit: https://github.com/ChristianHinge/dicom-mcp
 
 ## Run it
 
-- Minimal config (configs/dicom.yaml):
+- Minimal config (`configuration.yaml`):
 ```
 nodes:
   orthanc:
@@ -28,6 +28,7 @@ calling_aets:
 
 calling_aet: "default"
 query_root: "study"
+allow_remote_hosts: false
 
 network:
   acse_timeout: 10
@@ -45,7 +46,7 @@ network:
 
 - Start server (dev):
 ```
-uv run --with-editable '.' -m dicom_mcp ../configs/dicom.yaml
+uv run --with-editable '.' -m dicom_mcp configuration.yaml
 ```
 - If uv caches old code: add `--no-cache` or `--reinstall-package simple-dicom-mcp`.
 
@@ -62,7 +63,7 @@ uv run --with-editable '.' -m dicom_mcp ../configs/dicom.yaml
         "--",
         "bash",
         "-lc",
-        "cd '/mnt/c/Users/paulo/Python Projects/simple-dicom-mcp' && uv run --with-editable '.' python -m dicom_mcp '/mnt/c/Users/paulo/Python Projects/configs/dicom.yaml'"
+        "cd '/mnt/c/Users/paulo/Python Projects/simple-dicom-mcp' && uv run --with-editable '.' python -m dicom_mcp '/mnt/c/Users/paulo/Python Projects/simple-dicom-mcp/configuration.yaml'"
       ]
     }
   },
@@ -124,9 +125,10 @@ The `simple-dicom-mcp` server enables AI assistants to query and read data on DI
 
 <div align="center">
 
-🤝 **[Contribute](#contributing)** •
-📝 **[Report Bug](https://github.com/ChristianHinge/dicom-mcp/issues)**  •
-📝 **[Blog Post 1](https://www.christianhinge.com/projects/dicom-mcp/)** 
+🤝 **[Contributing guide](./CONTRIBUTING.md)** •
+🐞 **[Report bug](https://github.com/ThalesMMS/simple-dicom-mcp/issues/new/choose)** •
+🛟 **[Support](./SUPPORT.md)** •
+🔐 **[Security](./SECURITY.md)**
 
 </div>
 
@@ -184,6 +186,7 @@ calling_aets:
 
 calling_aet: "default"
 query_root: "study"
+allow_remote_hosts: false
 
 network:
   acse_timeout: 10
@@ -201,8 +204,9 @@ network:
 Notes:
 - `calling_aet` can be a name, alias, or AE title defined in `calling_aets`.
 - `query_root` accepts `study` or `patient`.
+- `allow_remote_hosts` defaults to `false` and blocks non-loopback DICOM hosts unless you explicitly opt in.
 > [!WARNING]
-Simple DICOM-MCP is not meant for clinical use, and should not be connected with live hospital databases or databases with patient-sensitive data. Doing so could lead to both loss of patient data, and leakage of patient data onto the internet. Simple DICOM-MCP can be used with locally hosted open-weight LLMs for complete data privacy. 
+Simple DICOM-MCP is not meant for clinical use, and should not be connected with live hospital databases or databases with patient-sensitive data. Doing so could lead to both loss of patient data, and leakage of patient data onto the internet. If you intentionally need a remote PACS or VNA, set `allow_remote_hosts: true` only after reviewing the risk and using a private, trusted environment.
 
 ### (Optional) Sample ORTHANC server
 If you don't have a DICOM server available, you can run a local ORTHANC server using Docker:
@@ -244,7 +248,7 @@ For development:
 ```json
 {
     "mcpServers": {
-        "arxiv-mcp-server": {
+        "simple-dicom-mcp": {
             "command": "uv",
             "args": [
                 "--directory",
@@ -282,6 +286,14 @@ For development:
 ### Example interaction
 The tools can be chained together to answer complex questions:
 
+
+## 🤝 Community health
+
+- Read `CONTRIBUTING.md` before opening a pull request.
+- Use the issue forms for bugs and focused feature ideas.
+- Follow `SECURITY.md` for vulnerability reporting.
+- Use `SUPPORT.md` for setup/help guidance.
+- Do not post PHI, real DICOM studies, or live PACS credentials in issues or PRs.
 
 ## 📈 Contributing
 ### Running Tests

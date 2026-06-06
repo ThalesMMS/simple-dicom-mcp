@@ -35,6 +35,9 @@ calling_aet: "default"
  
 # Query root selection ("study" or "patient")
 query_root: "study"
+
+# Keep remote PACS/VNA hosts disabled unless you explicitly trust the environment.
+allow_remote_hosts: false
  
 # Network timeouts and PDU size
 network:
